@@ -1,7 +1,7 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-export const authOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -11,7 +11,7 @@ export const authOptions = {
       },
       async authorize(credentials) {
         if (credentials?.username === "admin" && credentials?.password === "password") {
-          return { id: "1", name: "管理員" };
+          return { id: "1", name: "管理員" }; // 確保有 id
         }
         return null;
       },
@@ -20,6 +20,23 @@ export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/admin/signin",
+  },
+  session: {
+    strategy: "jwt",
+  },
+  callbacks: {
+    async session({ session, token }) {
+      if (session.user && token.sub) {
+        session.user.id = token.sub; // ✅ 確保 user.id 存在
+      }
+      return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.sub = user.id; // ✅ 確保 token.sub 正確
+      }
+      return token;
+    },
   },
 };
 
