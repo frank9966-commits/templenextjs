@@ -91,7 +91,7 @@ export default function RegisterStep() {
   };
 
   return (
-    <div className="hero min-h-screen bg-base-200 p-4">
+    <div className="hero min-h-screen bg-base-200 p-4 flex items-center justify-center">
       <div className="hero-content flex-col w-full">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-center">
