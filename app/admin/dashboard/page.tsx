@@ -37,36 +37,45 @@ export default function AdminDashboard() {
     <div className="container mx-auto p-4">
       <h1 className="text-xl font-bold text-center mb-4">報名狀況</h1>
       {error && <p className="text-red-500 text-center">{error}</p>}
-      <table className="table w-full">
-        <thead>
-          <tr>
-            <th>身分證</th>
-            <th>姓名</th>
-            <th>地址</th>
-            <th>生日</th>
-            <th>創造日期</th>
-            <th>參加活動名稱</th>
-            <th>是否參加</th>
-            <th>最後編輯時間</th>
-            <th>關係人</th>
-          </tr>
-        </thead>
-        <tbody>
-          {participants.map((p) => (
-            <tr key={p.id}>
-              <td>{p.id_card}</td>
-              <td>{p.name}</td>
-              <td>{p.address || "-"}</td>
-              <td>{p.birthday || "-"}</td>
-              <td>{new Date(p.created_at).toLocaleString()}</td>
-              <td>{p.events ? p.events.title : "-"}</td>
-              <td>{p.is_participated ? "參加" : "不參加"}</td>
-              <td>{new Date(p.updated_at).toLocaleString()}</td>
-              <td>{p.family_id || "-"}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      
+      {/* 新增：卡片式排版，符合手機優先 */}
+      <div className="flex flex-col gap-4">
+        {participants.map((p) => (
+          <div key={p.id} className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <h2 className="card-title">{p.name}</h2>
+              <p>
+                <strong>身分證:</strong> {p.id_card}
+              </p>
+              <p>
+                <strong>地址:</strong> {p.address || "-"}
+              </p>
+              <p>
+                <strong>生日:</strong> {p.birthday || "-"}
+              </p>
+              <p>
+                <strong>創造日期:</strong>{" "}
+                {new Date(p.created_at).toLocaleString()}
+              </p>
+              <p>
+                <strong>參加活動名稱:</strong>{" "}
+                {p.events ? p.events.title : "-"}
+              </p>
+              <p>
+                <strong>是否參加:</strong>{" "}
+                {p.is_participated ? "參加" : "不參加"}
+              </p>
+              <p>
+                <strong>最後編輯時間:</strong>{" "}
+                {new Date(p.updated_at).toLocaleString()}
+              </p>
+              <p>
+                <strong>關係人:</strong> {p.family_id || "-"}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
