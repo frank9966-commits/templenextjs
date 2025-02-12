@@ -38,14 +38,16 @@ export default function RegisterStep() {
     fetchCurrentEvent();
   }, []);
 
-  // 依身分證由 participants 撈取基本資料
+  // 依身分證由 participants 撈取基本資料 (使用者按「查詢資料」時)
   const handleCheckId = async () => {
     if (!idCard) return;
+    setError(""); // 清空錯誤訊息
     const { data, error } = await supabase
       .from("participants")
       .select("*")
       .eq("id_card", idCard)
       .single();
+
     if (error || !data) {
       setError("找不到基本資料，請手動輸入");
       setBasicInfo(null);
@@ -60,17 +62,21 @@ export default function RegisterStep() {
       setAddress(data.address || "");
       setBirthday(data.birthday || "");
       setFamilyId(data.family_id || "");
-      setError("");
+      setError(""); // 清空錯誤訊息
     }
   };
 
+  // 按「送出報名」時
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(""); // 先清空錯誤訊息
+
     if (!currentEvent) {
       setError("目前活動資訊取得失敗");
       return;
     }
-    // 組合報名資料，若 basicInfo 有值則使用其資料，否則採用手動輸入值
+
+    // 準備報名資料
     const participantData = {
       id_card: idCard,
       name: basicInfo ? basicInfo.name : "請自行輸入姓名",
@@ -81,12 +87,45 @@ export default function RegisterStep() {
       family_id: familyId,
     };
 
-    const { error } = await supabase.from("participants").insert([participantData]);
-    if (error) {
-      setError("報名失敗：" + error.message);
+    // **新增**：先查詢資料表，看是否已經有這個 id_card
+    const { data: existed, error: fetchError } = await supabase
+      .from("participants")
+      .select("*")
+      .eq("id_card", idCard)
+      .single();
+
+    // 如果查不到 (fetchError) 或沒有資料 => Insert
+    if (fetchError || !existed) {
+      const { error: insertError } = await supabase
+        .from("participants")
+        .insert([participantData]);
+
+      if (insertError) {
+        setError("報名失敗：" + insertError.message);
+      } else {
+        alert("報名成功！");
+      }
     } else {
-      alert("報名成功！");
-      // 可考慮重置表單狀態
+      // **已經存在** => Update
+      // 例如只更新 address、birthday、is_participated 等欄位
+      const { error: updateError } = await supabase
+        .from("participants")
+        .update({
+          // 你想更新哪些欄位就放哪些
+          name: participantData.name,
+          address: participantData.address,
+          birthday: participantData.birthday,
+          is_participated: participantData.is_participated,
+          family_id: participantData.family_id,
+        })
+        .eq("id_card", idCard);
+
+      if (updateError) {
+        setError("更新失敗：" + updateError.message);
+      } else {
+        // **顯示「已報名過」，並更新狀態**的提示
+        setError("您已註冊過，此次已幫您更新資料或狀態。");
+      }
     }
   };
 
@@ -99,26 +138,18 @@ export default function RegisterStep() {
           </h1>
         </div>
 
-        {/* 判斷使用者是否曾參加過 */}
+        {/* 是否曾參加 (是 / 否) */}
         {hasParticipated === null && (
           <div className="card w-full sm:max-w-sm md:max-w-md lg:max-w-lg shadow-xl bg-base-100 mx-auto">
             <div className="card-body">
-              <p className="text-center text-lg mb-4">您是否曾參加過此廟活動？</p>
+              <p className="text-center text-lg mb-4">您是否曾註冊過此帳號？</p>
               <div className="flex justify-center gap-4">
-                {/*
-                  ~~className="btn btn-success"~~
-                  **新增** 使用 DaisyUI 的 success (綠) + 自訂 hover
-                */}
                 <button
                   onClick={() => setHasParticipated(true)}
                   className="btn btn-success hover:bg-green-700"
                 >
                   是
                 </button>
-                {/*
-                  ~~className="btn btn-primary"~~
-                  **新增** 替否使用錯誤 (紅) + 自訂 hover
-                */}
                 <button
                   onClick={() => setHasParticipated(false)}
                   className="btn btn-error hover:bg-red-700"
@@ -130,7 +161,7 @@ export default function RegisterStep() {
           </div>
         )}
 
-        {/* 若之前填「是」 */}
+        {/* 若選「是」 */}
         {hasParticipated === true && (
           <div className="card w-full sm:max-w-sm md:max-w-md lg:max-w-lg shadow-xl bg-base-100 mx-auto">
             <div className="card-body">
@@ -147,6 +178,7 @@ export default function RegisterStep() {
               <button onClick={handleCheckId} className="btn btn-secondary w-full mb-4">
                 查詢資料
               </button>
+              {/* 顯示錯誤或提示訊息 */}
               {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
               {basicInfo && (
@@ -194,29 +226,32 @@ export default function RegisterStep() {
                       />
                     </div>
 
-                    {/* 參加 / 不參加 */}
+                    {/* 參加 / 不參加，根據 selectedParticipate 動態改樣式 */}
                     <div className="flex justify-between">
-                      {/*
-                        ~~className="btn btn-success w-1/2 mr-2"~~
-                        **新增** 加上 hover
-                      */}
                       <button
+                        type="button"
                         onClick={() => setSelectedParticipate(true)}
-                        className="btn btn-success hover:bg-green-700 w-1/2 mr-2"
+                        className={`btn w-1/2 mr-2 ${
+                          selectedParticipate === true
+                            ? "btn-success hover:bg-green-700"
+                            : "btn-outline hover:bg-green-700"
+                        }`}
                       >
                         參加
                       </button>
-                      {/*
-                        ~~className="btn btn-error w-1/2 ml-2"~~
-                        **新增** 加上 hover
-                      */}
                       <button
+                        type="button"
                         onClick={() => setSelectedParticipate(false)}
-                        className="btn btn-error hover:bg-red-700 w-1/2 ml-2"
+                        className={`btn w-1/2 ml-2 ${
+                          selectedParticipate === false
+                            ? "btn-error hover:bg-red-700"
+                            : "btn-outline hover:bg-red-700"
+                        }`}
                       >
                         不參加
                       </button>
                     </div>
+
                     <button onClick={handleSubmit} className="btn btn-primary w-full mt-4">
                       送出報名
                     </button>
@@ -227,7 +262,7 @@ export default function RegisterStep() {
           </div>
         )}
 
-        {/* 若之前填「否」 */}
+        {/* 若選「否」 */}
         {hasParticipated === false && (
           <form
             onSubmit={handleSubmit}
@@ -271,27 +306,26 @@ export default function RegisterStep() {
                 className="input input-bordered w-full"
               />
 
-              {/* 參加 / 不參加 */}
               <div className="flex justify-between">
-                {/*
-                  ~~className="btn btn-success w-1/2 mr-2"~~
-                  **新增** 加上 hover
-                */}
                 <button
                   type="button"
                   onClick={() => setSelectedParticipate(true)}
-                  className="btn btn-success hover:bg-green-700 w-1/2 mr-2"
+                  className={`btn w-1/2 mr-2 ${
+                    selectedParticipate === true
+                      ? "btn-success hover:bg-green-700"
+                      : "btn-outline hover:bg-green-700"
+                  }`}
                 >
                   參加
                 </button>
-                {/*
-                  ~~className="btn btn-error w-1/2 ml-2"~~
-                  **新增** 加上 hover
-                */}
                 <button
                   type="button"
                   onClick={() => setSelectedParticipate(false)}
-                  className="btn btn-error hover:bg-red-700 w-1/2 ml-2"
+                  className={`btn w-1/2 ml-2 ${
+                    selectedParticipate === false
+                      ? "btn-error hover:bg-red-700"
+                      : "btn-outline hover:bg-red-700"
+                  }`}
                 >
                   不參加
                 </button>
