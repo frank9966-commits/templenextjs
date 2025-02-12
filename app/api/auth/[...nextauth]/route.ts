@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-export const authOptions = {
+const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -23,5 +23,6 @@ export const authOptions = {
   },
 };
 
+// ✅ 正確的 API Handler 格式
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
