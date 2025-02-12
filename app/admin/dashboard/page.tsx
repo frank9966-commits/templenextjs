@@ -23,7 +23,7 @@ export default function AdminDashboard() {
     async function fetchParticipants() {
       const { data, error } = await supabase
         .from("participants")
-        .select("*, events(title)"); // 【新增】加入 events 的 title 資料
+        .select("*, events(title)");
       if (error) {
         setError("取得資料失敗：" + error.message);
       } else {
@@ -34,44 +34,31 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-xl font-bold text-center mb-4">報名狀況</h1>
+    <div className="w-full max-w-4xl mx-auto p-4">
+      <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4 sticky top-0 bg-base-200 p-4 z-10">
+        報名狀況
+      </h1>
       {error && <p className="text-red-500 text-center">{error}</p>}
-      
-      {/* 新增：卡片式排版，符合手機優先 */}
-      <div className="flex flex-col gap-4">
+
+      {/* RWD 優化 + 滾動 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto max-h-[calc(100vh-150px)] p-2">
         {participants.map((p) => (
-          <div key={p.id} className="card bg-base-100 shadow-xl">
+          <div key={p.id} className="card bg-base-100 shadow-lg">
             <div className="card-body">
-              <h2 className="card-title">{p.name}</h2>
-              <p>
-                <strong>身分證:</strong> {p.id_card}
-              </p>
-              <p>
-                <strong>地址:</strong> {p.address || "-"}
-              </p>
-              <p>
-                <strong>生日:</strong> {p.birthday || "-"}
-              </p>
-              <p>
-                <strong>創造日期:</strong>{" "}
-                {new Date(p.created_at).toLocaleString()}
-              </p>
-              <p>
-                <strong>參加活動名稱:</strong>{" "}
-                {p.events ? p.events.title : "-"}
-              </p>
+              <h2 className="card-title text-lg font-bold">{p.name}</h2>
+              <p><strong>身分證:</strong> {p.id_card}</p>
+              <p><strong>地址:</strong> {p.address || "-"}</p>
+              <p><strong>生日:</strong> {p.birthday || "-"}</p>
+              <p><strong>創造日期:</strong> {new Date(p.created_at).toLocaleString()}</p>
+              <p><strong>參加活動名稱:</strong> {p.events ? p.events.title : "-"}</p>
               <p>
                 <strong>是否參加:</strong>{" "}
-                {p.is_participated ? "參加" : "不參加"}
+                <span className={p.is_participated ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>
+                  {p.is_participated ? "參加" : "不參加"}
+                </span>
               </p>
-              <p>
-                <strong>最後編輯時間:</strong>{" "}
-                {new Date(p.updated_at).toLocaleString()}
-              </p>
-              <p>
-                <strong>關係人:</strong> {p.family_id || "-"}
-              </p>
+              <p><strong>最後編輯時間:</strong> {new Date(p.updated_at).toLocaleString()}</p>
+              <p><strong>關係人:</strong> {p.family_id || "-"}</p>
             </div>
           </div>
         ))}

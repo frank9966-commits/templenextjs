@@ -18,14 +18,14 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="hero min-h-screen bg-base-200">
-      <div className="hero-content flex-col">
-        <h1 className="text-5xl font-bold text-center">{title || "活動標題"}</h1>
-        <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-          <a href="/register" className="btn btn-primary">
+    <div className="hero min-h-screen bg-base-200 flex items-center justify-center">
+      <div className="hero-content w-full max-w-2xl text-center">
+        <h1 className="text-4xl sm:text-5xl font-bold">{title || "活動標題"}</h1>
+        <div className="mt-8 flex flex-col gap-4 sm:flex-row justify-center">
+          <a href="/register" className="btn btn-primary w-full sm:w-auto">
             報名參加
           </a>
-          <a href="/admin/signin" className="btn btn-secondary">
+          <a href="/admin/signin" className="btn btn-secondary w-full sm:w-auto">
             管理後台
           </a>
         </div>
