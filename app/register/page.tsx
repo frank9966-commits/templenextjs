@@ -137,7 +137,7 @@ export default function RegisterStep() {
               />
               <p>生日：</p>
               <input
-                type="date"
+                type="text"
                 placeholder="生日"
                 value={birthday}
                 onChange={(e) => setBirthday(e.target.value)}
@@ -193,7 +193,7 @@ export default function RegisterStep() {
             className="input input-bordered w-full"
           />
           <input
-            type="date"
+            type="text"
             placeholder="生日"
             value={birthday}
             onChange={(e) => setBirthday(e.target.value)}
