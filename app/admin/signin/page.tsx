@@ -8,20 +8,46 @@ export default function SignIn() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const res = await signIn("credentials", { redirect: false, username: formData.get("username"), password: formData.get("password") });
+    const res = await signIn("credentials", {
+      redirect: false,
+      username: formData.get("username"),
+      password: formData.get("password")
+    });
     if (res?.error) setError("登入失敗");
     else window.location.href = "/admin/dashboard";
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-xl font-bold text-center">管理員登入</h1>
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
-        <input type="text" name="username" placeholder="使用者名稱" className="input input-bordered w-full" />
-        <input type="password" name="password" placeholder="密碼" className="input input-bordered w-full" />
-        <button type="submit" className="btn btn-primary w-full">登入</button>
-      </form>
-      {error && <p className="text-red-500 text-center">{error}</p>}
+    <div className="min-h-screen flex items-center justify-center bg-base-200">
+      <div className="card w-96 bg-base-100 shadow-xl">
+        <div className="card-body">
+          <h2 className="card-title justify-center">管理員登入</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="form-control">
+              <input
+                type="text"
+                name="username"
+                placeholder="使用者名稱"
+                className="input input-bordered"
+              />
+            </div>
+            <div className="form-control">
+              <input
+                type="password"
+                name="password"
+                placeholder="密碼"
+                className="input input-bordered"
+              />
+            </div>
+            {error && <p className="text-red-500 text-center">{error}</p>}
+            <div className="form-control mt-6">
+              <button type="submit" className="btn btn-primary">
+                登入
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

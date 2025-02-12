@@ -6,7 +6,6 @@ import { supabase } from "@/lib/supabaseClient";
 export default function RegisterStep() {
   const [hasParticipated, setHasParticipated] = useState<boolean | null>(null);
   const [idCard, setIdCard] = useState("");
-  // 更新 basicInfo 型別，擴充地址、生日、關係人欄位
   const [basicInfo, setBasicInfo] = useState<{
     name: string;
     address?: string;
@@ -16,7 +15,7 @@ export default function RegisterStep() {
   const [error, setError] = useState("");
   const [selectedParticipate, setSelectedParticipate] = useState<boolean | null>(null);
 
-  // 獨立狀態，若使用者需手動輸入資料時，提供地址、生日、關係人的輸入值
+  // 若使用者需手動輸入資料時提供的輸入值
   const [address, setAddress] = useState("");
   const [birthday, setBirthday] = useState("");
   const [familyId, setFamilyId] = useState("");
@@ -92,177 +91,179 @@ export default function RegisterStep() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold text-center mb-6">
-        報名活動 {currentEvent ? `- ${currentEvent.title}` : ""}
-      </h1>
-
-      {/* 當使用者尚未選擇是否曾參加過活動 */}
-      {hasParticipated === null && (
-        <div className="card bg-base-200 p-6 rounded-lg shadow-md max-w-md mx-auto">
-          <p className="text-center text-lg mb-4">您是否曾參加過此廟活動？</p>
-          <div className="flex justify-center gap-4">
-            <button onClick={() => setHasParticipated(true)} className="btn btn-success">
-              是
-            </button>
-            <button onClick={() => setHasParticipated(false)} className="btn btn-primary">
-              否
-            </button>
-          </div>
+    <div className="hero min-h-screen bg-base-200">
+      <div className="hero-content flex-col w-full">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-center">
+            報名活動 {currentEvent ? `- ${currentEvent.title}` : ""}
+          </h1>
         </div>
-      )}
 
-      {/* 若曾參加過，透過身分證查詢基本資料後再報名 */}
-      {hasParticipated === true && (
-        <div className="card bg-base-200 p-6 rounded-lg shadow-md max-w-md mx-auto">
-          <p className="text-center text-lg mb-4">請輸入您的身分證以查詢基本資料：</p>
-          <div className="flex flex-col gap-4">
-            <input
-              type="text"
-              placeholder="身分證"
-              value={idCard}
-              onChange={(e) => setIdCard(e.target.value)}
-              className="input input-bordered w-full"
-            />
-            <button onClick={handleCheckId} className="btn btn-secondary">
-              查詢資料
-            </button>
-            {error && <p className="text-red-500 text-center">{error}</p>}
+        {hasParticipated === null && (
+          <div className="card w-full max-w-md shadow-xl bg-base-100">
+            <div className="card-body">
+              <p className="text-center text-lg mb-4">您是否曾參加過此廟活動？</p>
+              <div className="flex justify-center gap-4">
+                <button onClick={() => setHasParticipated(true)} className="btn btn-success">
+                  是
+                </button>
+                <button onClick={() => setHasParticipated(false)} className="btn btn-primary">
+                  否
+                </button>
+              </div>
+            </div>
           </div>
+        )}
 
-          {basicInfo && (
-            <div className="card bg-base-100 p-6 mt-6 rounded-lg shadow-sm">
-              <h2 className="text-xl font-bold mb-4">基本資料</h2>
-              <p className="mb-2">
-                <span className="font-semibold">姓名：</span>
-                {basicInfo.name}
-              </p>
-              <div className="form-control mb-2">
-                <label className="label">
-                  <span className="label-text">地址：</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="地址"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="input input-bordered w-full"
-                />
-              </div>
-              <div className="form-control mb-2">
-                <label className="label">
-                  <span className="label-text">生日：</span>
-                </label>
-                {/*
-                  這裡使用文字輸入，不使用日期選擇器，
-                  讓使用者自行輸入中文格式的生日
-                */}
-                <input
-                  type="text"
-                  placeholder="生日"
-                  value={birthday}
-                  onChange={(e) => setBirthday(e.target.value)}
-                  className="input input-bordered w-full"
-                />
-              </div>
+        {hasParticipated === true && (
+          <div className="card w-full max-w-md shadow-xl bg-base-100">
+            <div className="card-body">
+              <p className="text-center text-lg mb-4">請輸入您的身分證以查詢基本資料：</p>
               <div className="form-control mb-4">
-                <label className="label">
-                  <span className="label-text">關係人 (家族代號)：</span>
-                </label>
                 <input
                   type="text"
-                  placeholder="關係人"
-                  value={familyId}
-                  onChange={(e) => setFamilyId(e.target.value)}
+                  placeholder="身分證"
+                  value={idCard}
+                  onChange={(e) => setIdCard(e.target.value)}
                   className="input input-bordered w-full"
                 />
               </div>
+              <button onClick={handleCheckId} className="btn btn-secondary w-full mb-4">
+                查詢資料
+              </button>
+              {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
+              {basicInfo && (
+                <div className="card mt-6 shadow-lg bg-base-50">
+                  <div className="card-body">
+                    <h2 className="card-title mb-4">基本資料</h2>
+                    <p className="mb-2">
+                      <span className="font-semibold">姓名：</span>
+                      {basicInfo.name}
+                    </p>
+                    <div className="form-control mb-2">
+                      <label className="label">
+                        <span className="label-text">地址：</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="地址"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        className="input input-bordered w-full"
+                      />
+                    </div>
+                    <div className="form-control mb-2">
+                      <label className="label">
+                        <span className="label-text">生日：</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="生日"
+                        value={birthday}
+                        onChange={(e) => setBirthday(e.target.value)}
+                        className="input input-bordered w-full"
+                      />
+                    </div>
+                    <div className="form-control mb-4">
+                      <label className="label">
+                        <span className="label-text">關係人 (家族代號)：</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="關係人"
+                        value={familyId}
+                        onChange={(e) => setFamilyId(e.target.value)}
+                        className="input input-bordered w-full"
+                      />
+                    </div>
+                    <div className="flex justify-between">
+                      <button
+                        onClick={() => setSelectedParticipate(true)}
+                        className="btn btn-success w-1/2 mr-2"
+                      >
+                        參加
+                      </button>
+                      <button
+                        onClick={() => setSelectedParticipate(false)}
+                        className="btn btn-error w-1/2 ml-2"
+                      >
+                        不參加
+                      </button>
+                    </div>
+                    <button onClick={handleSubmit} className="btn btn-primary w-full mt-4">
+                      送出報名
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {hasParticipated === false && (
+          <form onSubmit={handleSubmit} className="card w-full max-w-md shadow-xl bg-base-100">
+            <div className="card-body space-y-4">
+              <input
+                type="text"
+                placeholder="身分證"
+                value={idCard}
+                onChange={(e) => setIdCard(e.target.value)}
+                className="input input-bordered w-full"
+              />
+              <input
+                type="text"
+                placeholder="姓名"
+                onChange={(e) =>
+                  setBasicInfo((prev) => ({ ...prev, name: e.target.value }))
+                }
+                className="input input-bordered w-full"
+              />
+              <input
+                type="text"
+                placeholder="地址"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="input input-bordered w-full"
+              />
+              <input
+                type="text"
+                placeholder="生日"
+                value={birthday}
+                onChange={(e) => setBirthday(e.target.value)}
+                className="input input-bordered w-full"
+              />
+              <input
+                type="text"
+                placeholder="關係人 (家族代號)"
+                value={familyId}
+                onChange={(e) => setFamilyId(e.target.value)}
+                className="input input-bordered w-full"
+              />
               <div className="flex justify-between">
                 <button
+                  type="button"
                   onClick={() => setSelectedParticipate(true)}
                   className="btn btn-success w-1/2 mr-2"
                 >
                   參加
                 </button>
                 <button
+                  type="button"
                   onClick={() => setSelectedParticipate(false)}
                   className="btn btn-error w-1/2 ml-2"
                 >
                   不參加
                 </button>
               </div>
-              <button onClick={handleSubmit} className="btn btn-primary w-full mt-4">
+              <button type="submit" className="btn btn-primary w-full">
                 送出報名
               </button>
+              {error && <p className="text-red-500 text-center">{error}</p>}
             </div>
-          )}
-        </div>
-      )}
-
-      {/* 若從未參加過，使用者自行輸入基本資料 */}
-      {hasParticipated === false && (
-        <form
-          onSubmit={handleSubmit}
-          className="card bg-base-200 p-6 rounded-lg shadow-md max-w-md mx-auto space-y-4"
-        >
-          <input
-            type="text"
-            placeholder="身分證"
-            value={idCard}
-            onChange={(e) => setIdCard(e.target.value)}
-            className="input input-bordered w-full"
-          />
-          <input
-            type="text"
-            placeholder="姓名"
-            onChange={(e) =>
-              setBasicInfo((prev) => ({ ...prev, name: e.target.value }))
-            }
-            className="input input-bordered w-full"
-          />
-          <input
-            type="text"
-            placeholder="地址"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            className="input input-bordered w-full"
-          />
-          <input
-            type="text"
-            placeholder="生日"
-            value={birthday}
-            onChange={(e) => setBirthday(e.target.value)}
-            className="input input-bordered w-full"
-          />
-          <input
-            type="text"
-            placeholder="關係人 (家族代號)"
-            value={familyId}
-            onChange={(e) => setFamilyId(e.target.value)}
-            className="input input-bordered w-full"
-          />
-          <div className="flex justify-between">
-            <button
-              type="button"
-              onClick={() => setSelectedParticipate(true)}
-              className="btn btn-success w-1/2 mr-2"
-            >
-              參加
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedParticipate(false)}
-              className="btn btn-error w-1/2 ml-2"
-            >
-              不參加
-            </button>
-          </div>
-          <button type="submit" className="btn btn-primary w-full">
-            送出報名
-          </button>
-          {error && <p className="text-red-500 text-center">{error}</p>}
-        </form>
-      )}
+          </form>
+        )}
+      </div>
     </div>
   );
 }
