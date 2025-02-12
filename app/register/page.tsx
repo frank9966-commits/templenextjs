@@ -91,7 +91,7 @@ export default function RegisterStep() {
   };
 
   return (
-    <div className="hero min-h-screen bg-base-200">
+    <div className="hero min-h-screen bg-base-200 p-4">
       <div className="hero-content flex-col w-full">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-center">
@@ -99,15 +99,30 @@ export default function RegisterStep() {
           </h1>
         </div>
 
+        {/* 判斷使用者是否曾參加過 */}
         {hasParticipated === null && (
-          <div className="card w-full max-w-md shadow-xl bg-base-100">
+          <div className="card w-full sm:max-w-sm md:max-w-md lg:max-w-lg shadow-xl bg-base-100 mx-auto">
             <div className="card-body">
               <p className="text-center text-lg mb-4">您是否曾參加過此廟活動？</p>
               <div className="flex justify-center gap-4">
-                <button onClick={() => setHasParticipated(true)} className="btn btn-success">
+                {/*
+                  ~~className="btn btn-success"~~
+                  **新增** 使用 DaisyUI 的 success (綠) + 自訂 hover
+                */}
+                <button
+                  onClick={() => setHasParticipated(true)}
+                  className="btn btn-success hover:bg-green-700"
+                >
                   是
                 </button>
-                <button onClick={() => setHasParticipated(false)} className="btn btn-primary">
+                {/*
+                  ~~className="btn btn-primary"~~
+                  **新增** 替否使用錯誤 (紅) + 自訂 hover
+                */}
+                <button
+                  onClick={() => setHasParticipated(false)}
+                  className="btn btn-error hover:bg-red-700"
+                >
                   否
                 </button>
               </div>
@@ -115,8 +130,9 @@ export default function RegisterStep() {
           </div>
         )}
 
+        {/* 若之前填「是」 */}
         {hasParticipated === true && (
-          <div className="card w-full max-w-md shadow-xl bg-base-100">
+          <div className="card w-full sm:max-w-sm md:max-w-md lg:max-w-lg shadow-xl bg-base-100 mx-auto">
             <div className="card-body">
               <p className="text-center text-lg mb-4">請輸入您的身分證以查詢基本資料：</p>
               <div className="form-control mb-4">
@@ -177,16 +193,26 @@ export default function RegisterStep() {
                         className="input input-bordered w-full"
                       />
                     </div>
+
+                    {/* 參加 / 不參加 */}
                     <div className="flex justify-between">
+                      {/*
+                        ~~className="btn btn-success w-1/2 mr-2"~~
+                        **新增** 加上 hover
+                      */}
                       <button
                         onClick={() => setSelectedParticipate(true)}
-                        className="btn btn-success w-1/2 mr-2"
+                        className="btn btn-success hover:bg-green-700 w-1/2 mr-2"
                       >
                         參加
                       </button>
+                      {/*
+                        ~~className="btn btn-error w-1/2 ml-2"~~
+                        **新增** 加上 hover
+                      */}
                       <button
                         onClick={() => setSelectedParticipate(false)}
-                        className="btn btn-error w-1/2 ml-2"
+                        className="btn btn-error hover:bg-red-700 w-1/2 ml-2"
                       >
                         不參加
                       </button>
@@ -201,8 +227,12 @@ export default function RegisterStep() {
           </div>
         )}
 
+        {/* 若之前填「否」 */}
         {hasParticipated === false && (
-          <form onSubmit={handleSubmit} className="card w-full max-w-md shadow-xl bg-base-100">
+          <form
+            onSubmit={handleSubmit}
+            className="card w-full sm:max-w-sm md:max-w-md lg:max-w-lg shadow-xl bg-base-100 mx-auto"
+          >
             <div className="card-body space-y-4">
               <input
                 type="text"
@@ -240,22 +270,33 @@ export default function RegisterStep() {
                 onChange={(e) => setFamilyId(e.target.value)}
                 className="input input-bordered w-full"
               />
+
+              {/* 參加 / 不參加 */}
               <div className="flex justify-between">
+                {/*
+                  ~~className="btn btn-success w-1/2 mr-2"~~
+                  **新增** 加上 hover
+                */}
                 <button
                   type="button"
                   onClick={() => setSelectedParticipate(true)}
-                  className="btn btn-success w-1/2 mr-2"
+                  className="btn btn-success hover:bg-green-700 w-1/2 mr-2"
                 >
                   參加
                 </button>
+                {/*
+                  ~~className="btn btn-error w-1/2 ml-2"~~
+                  **新增** 加上 hover
+                */}
                 <button
                   type="button"
                   onClick={() => setSelectedParticipate(false)}
-                  className="btn btn-error w-1/2 ml-2"
+                  className="btn btn-error hover:bg-red-700 w-1/2 ml-2"
                 >
                   不參加
                 </button>
               </div>
+
               <button type="submit" className="btn btn-primary w-full">
                 送出報名
               </button>
