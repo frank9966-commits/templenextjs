@@ -1,10 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverActions: {
-      bodySizeLimit: "2mb",
-      allowedOrigins: ["*"],
-    },
+    serverActions: true, // ✅ 正確寫法
   },
 };
 
