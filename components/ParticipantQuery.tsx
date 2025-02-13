@@ -29,6 +29,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     family_id?: string;
     participation_status?: "join" | "none" | "agent";
     event_id?: number,
+    event_date: string,
     zodiac_sign?: string;
   } | null>(null);
   const [error, setError] = useState("");
@@ -55,6 +56,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
         address: data.address,
         birthday: data.birthday,
         family_id: data.family_id,
+        event_date: data.event_date,
         participation_status: data.participation_status,
         zodiac_sign: data.zodiac_sign,
       });
@@ -110,6 +112,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       address: member.address || "未填寫",
       birthday: member.birthday || "未填寫",
       family_id: member.family_id || "未填寫",
+      event_date: member.event_date || "未填寫",
       participation_status: member.participation_status || "none",
       zodiac_sign: member.zodiac_sign || "未填寫",
       event_id: latestEvent.id, // ✅ 確保 `event_id` 是最新活動
@@ -154,6 +157,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       address: basicInfo.address || "未填寫",
       birthday: basicInfo.birthday || "未填寫",
       family_id: basicInfo.family_id || "未填寫",
+      event_date: basicInfo.event_date || "event_date",
       participation_status: basicInfo.participation_status || "none",
       zodiac_sign: basicInfo.zodiac_sign || "未填寫",
       event_id: latestEvent.id, // ✅ 確保 `event_id` 是最新活動
@@ -274,6 +278,20 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                     required
                     onChange={(e) =>
                       setBasicInfo({ ...basicInfo, family_id: e.target.value })
+                    }
+                    className="input input-bordered w-full"
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">參加日期</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={basicInfo.event_date || ""}
+                    required
+                    onChange={(e) =>
+                      setBasicInfo({ ...basicInfo, event_date: e.target.value })
                     }
                     className="input input-bordered w-full"
                   />
@@ -408,6 +426,21 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             className="input input-bordered w-full"
                           />
                         </div>
+                        <div className="form-control">
+                          <label className="label">
+                            <span className="label-text">參加日期</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={basicInfo.event_date || ""}
+                            required
+                            onChange={(e) =>
+                              setBasicInfo({ ...basicInfo, event_date: e.target.value })
+                            }
+                            className="input input-bordered w-full"
+                          />
+                        </div>
+                        
                         {/* 參加狀態 */}
                         <div className="flex gap-2 py-2">
                           <button
