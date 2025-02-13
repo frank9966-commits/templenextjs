@@ -1,6 +1,8 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import HomeButton from "@/components/HomeButton"; // 引入回首頁按鈕
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,9 +26,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/* 可以在此放入 Header 並放置回首頁按鈕 */}
+        <header className="p-4 bg-base-200">
+          <HomeButton />
+        </header>
         {children}
       </body>
     </html>

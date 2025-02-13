@@ -6,7 +6,7 @@ interface Participant {
   id: number;
   id_card: string;
   name: string;
-  is_participated: boolean;
+  participation_status?: string;
   address?: string;
   birthday?: string;
   created_at: string;
@@ -52,9 +52,11 @@ export default function AdminDashboard() {
               <p><strong>參加活動名稱:</strong> {p.events ? p.events.title : "-"}</p>
               <p>
                 <strong>是否參加:</strong>{" "}
-                <span className={p.is_participated ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>
-                  {p.is_participated ? "參加" : "不參加"}
-                </span>
+                {p.participation_status === "join" ? (
+                  <span className="text-green-600 font-semibold">參加</span>
+                ) : (
+                  <span className="text-red-600 font-semibold">不參加</span>
+                )}
               </p>
               <p><strong>關係人:</strong> {p.family_id || "-"}</p>
               <p><strong>創造日期:</strong> {new Date(p.created_at).toLocaleString()}</p>

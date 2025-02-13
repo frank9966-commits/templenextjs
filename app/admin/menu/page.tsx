@@ -13,7 +13,7 @@ export default function AdminMenu() {
             onClick={() => router.push("/admin/edit-event")}
             className="btn btn-primary w-full"
           >
-            編輯活動標題
+            新增活動標題
           </button>
           <button
             onClick={() => router.push("/admin/dashboard")}
