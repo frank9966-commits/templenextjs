@@ -12,6 +12,7 @@ export interface Participant {
   address?: string;
   birthday?: string;
   family_id?: string;
+  event_date?: string;
   event_id?: number;
   participation_status?: "join" | "none" | "agent";
   zodiac_sign?: string;
@@ -29,7 +30,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     family_id?: string;
     participation_status?: "join" | "none" | "agent";
     event_id?: number,
-    event_date: string,
+    event_date?: string,
     zodiac_sign?: string;
   } | null>(null);
   const [error, setError] = useState("");
