@@ -170,7 +170,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     if (error) {
       alert("更新基本資料失敗：" + error.message);
     } else {
-      alert("基本資料更新成功！");
+      alert(`基本資料更新成功！,一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`);
     }
   };
 
