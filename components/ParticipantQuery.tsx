@@ -91,16 +91,19 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
 
   // 更新單筆家族成員資料到資料庫
   const handleUpdateMember = async (member: Participant) => {
+    const updatedData = {
+      name: member.name || "未填寫",
+      address: member.address || "未填寫",
+      birthday: member.birthday || "未填寫",
+      family_id: member.family_id || "未填寫",
+      participation_status: member.participation_status || "none",
+      zodiac_sign: member.zodiac_sign || "未填寫",
+      admin_viewed: false,
+    };
+
     const { error } = await supabase
       .from("participants")
-      .update({
-        name: member.name,
-        address: member.address,
-        birthday: member.birthday,
-        participation_status: member.participation_status,
-        family_id: member.family_id,
-        zodiac_sign: member.zodiac_sign,
-      })
+      .update(updatedData)
       .eq("id_card", member.id_card);
 
     if (error) {
@@ -110,26 +113,33 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     }
   };
 
+
   // 更新基本資料（沒有家族成員時使用）
   const handleUpdateBasicInfo = async () => {
     if (!basicInfo) return;
+
+    const updatedData = {
+      name: basicInfo.name || "未填寫",
+      address: basicInfo.address || "未填寫",
+      birthday: basicInfo.birthday || "未填寫",
+      family_id: basicInfo.family_id || "未填寫",
+      participation_status: basicInfo.participation_status || "none",
+      zodiac_sign: basicInfo.zodiac_sign || "未填寫",
+      admin_viewed: false,
+    };
+
     const { error } = await supabase
       .from("participants")
-      .update({
-        name: basicInfo.name,
-        address: basicInfo.address,
-        birthday: basicInfo.birthday,
-        family_id: basicInfo.family_id,
-        participation_status: basicInfo.participation_status,
-        zodiac_sign: basicInfo.zodiac_sign,
-      })
+      .update(updatedData)
       .eq("id_card", idCard);
+
     if (error) {
       alert("更新基本資料失敗：" + error.message);
     } else {
       alert("基本資料更新成功！");
     }
   };
+
 
   return (
     <div className="card w-full shadow-xl bg-base-100">
@@ -169,6 +179,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   <input
                     type="text"
                     value={basicInfo.name}
+                    required
                     onChange={(e) =>
                       setBasicInfo({ ...basicInfo, name: e.target.value })
                     }
@@ -182,6 +193,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   <input
                     type="text"
                     value={basicInfo.address || ""}
+                    required
                     onChange={(e) =>
                       setBasicInfo({ ...basicInfo, address: e.target.value })
                     }
@@ -195,6 +207,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   <input
                     type="text"
                     value={basicInfo.birthday || ""}
+                    required
                     onChange={(e) =>
                       setBasicInfo({ ...basicInfo, birthday: e.target.value })
                     }
@@ -209,6 +222,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                     type="text"
                     placeholder="輸入您的生肖"
                     value={basicInfo?.zodiac_sign || ""}
+                    required
                     onChange={(e) =>
                       setBasicInfo({ ...basicInfo, zodiac_sign: e.target.value })
                     }
@@ -222,6 +236,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   <input
                     type="text"
                     value={basicInfo.family_id || ""}
+                    required
                     onChange={(e) =>
                       setBasicInfo({ ...basicInfo, family_id: e.target.value })
                     }
