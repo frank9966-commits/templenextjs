@@ -123,12 +123,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
           </label>
           <input
             type="text"
-            placeholder="範例：八十四年四月二十七日 亥時。"
+            placeholder="範例：八十四年四月二十七日 亥時。 如不知時辰，請寫吉時"
             value={birthday}
             onChange={(e) => setBirthday(e.target.value)}
             className="input input-bordered w-full"
           />
-          <p className=" text-xs mt-2">範例：八十四年四月二十七日 亥時</p>
+          <p className=" text-xs mt-2">範例：八十四年四月二十七日 亥時。 如不知時辰，請寫吉時</p>
         </div>
 
         <div className="form-control">
