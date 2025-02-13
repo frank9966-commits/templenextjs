@@ -28,6 +28,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     birthday?: string;
     family_id?: string;
     participation_status?: "join" | "none" | "agent";
+    event_id?: number,
     zodiac_sign?: string;
   } | null>(null);
   const [error, setError] = useState("");
@@ -91,6 +92,19 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
 
   // 更新單筆家族成員資料到資料庫
   const handleUpdateMember = async (member: Participant) => {
+    // ✅ 先查詢最新活動 ID
+    const { data: latestEvent, error: eventError } = await supabase
+      .from("events")
+      .select("id")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
+  
+    if (eventError || !latestEvent) {
+      alert("無法取得最新活動資訊");
+      return;
+    }
+  
     const updatedData = {
       name: member.name || "未填寫",
       address: member.address || "未填寫",
@@ -98,26 +112,44 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       family_id: member.family_id || "未填寫",
       participation_status: member.participation_status || "none",
       zodiac_sign: member.zodiac_sign || "未填寫",
+      event_id: latestEvent.id, // ✅ 確保 `event_id` 是最新活動
       admin_viewed: false,
     };
-
+  
+    console.log("更新家族成員資料:", updatedData);
+  
     const { error } = await supabase
       .from("participants")
       .update(updatedData)
-      .eq("id_card", member.id_card);
-
+      .eq("id_card", member.id_card)
+      .eq("event_id", latestEvent.id); // ✅ 確保更新的是最新活動
+  
     if (error) {
       alert("更新失敗：" + error.message);
     } else {
       alert("更新成功！");
     }
   };
+  
 
 
   // 更新基本資料（沒有家族成員時使用）
   const handleUpdateBasicInfo = async () => {
     if (!basicInfo) return;
-
+  
+    // ✅ 先查詢最新活動 ID
+    const { data: latestEvent, error: eventError } = await supabase
+      .from("events")
+      .select("id")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
+  
+    if (eventError || !latestEvent) {
+      alert("無法取得最新活動資訊");
+      return;
+    }
+  
     const updatedData = {
       name: basicInfo.name || "未填寫",
       address: basicInfo.address || "未填寫",
@@ -125,20 +157,25 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       family_id: basicInfo.family_id || "未填寫",
       participation_status: basicInfo.participation_status || "none",
       zodiac_sign: basicInfo.zodiac_sign || "未填寫",
+      event_id: latestEvent.id, // ✅ 確保 `event_id` 是最新活動
       admin_viewed: false,
     };
-
+  
+    console.log("更新資料:", updatedData);
+  
     const { error } = await supabase
       .from("participants")
       .update(updatedData)
-      .eq("id_card", idCard);
-
+      .eq("id_card", idCard)
+      .eq("event_id", latestEvent.id); // ✅ 確保更新的是最新活動
+  
     if (error) {
       alert("更新基本資料失敗：" + error.message);
     } else {
       alert("基本資料更新成功！");
     }
   };
+  
 
 
   return (
