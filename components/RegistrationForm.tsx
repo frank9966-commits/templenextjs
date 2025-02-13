@@ -28,6 +28,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       birthday,
       event_id: currentEvent.id,
       family_id: familyId,
+      participation_status: selectedParticipate ? "join" : "none", // 加入參加狀態
     };
 
     // 檢查是否已存在該 id
@@ -42,12 +43,18 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       const { error: insertError } = await supabase
         .from("participants")
         .insert([participantData]);
+
       if (insertError) {
         setError("報名失敗：" + insertError.message);
       } else {
-        alert(
-          `名子: ${basicInfo?.name || participantData.name} 報名成功！\n\n報名成功，記得繳交費用。\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
-        );
+        // 參加者才顯示付款資訊
+        if (selectedParticipate) {
+          alert(
+            `名子: ${basicInfo?.name || participantData.name} 註冊與報名成功！\n\n報名成功，記得繳交費用。\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
+          );
+        } else {
+          alert(`名子: ${basicInfo?.name || participantData.name} 註冊與報名成功！`);
+        }
         window.location.reload();
       }
     } else {
@@ -56,6 +63,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       router.push("/");
     }
   };
+
 
   return (
     <form onSubmit={handleSubmit} className="card w-full shadow-xl bg-base-100">
