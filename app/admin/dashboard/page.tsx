@@ -49,7 +49,6 @@ export default function AdminDashboard() {
               <p><strong>身分證:</strong> {p.id_card}</p>
               <p><strong>地址:</strong> {p.address || "-"}</p>
               <p><strong>生日:</strong> {p.birthday || "-"}</p>
-              <p><strong>創造日期:</strong> {new Date(p.created_at).toLocaleString()}</p>
               <p><strong>參加活動名稱:</strong> {p.events ? p.events.title : "-"}</p>
               <p>
                 <strong>是否參加:</strong>{" "}
@@ -57,8 +56,9 @@ export default function AdminDashboard() {
                   {p.is_participated ? "參加" : "不參加"}
                 </span>
               </p>
-              <p><strong>最後編輯時間:</strong> {new Date(p.updated_at).toLocaleString()}</p>
               <p><strong>關係人:</strong> {p.family_id || "-"}</p>
+              <p><strong>創造日期:</strong> {new Date(p.created_at).toLocaleString()}</p>
+              <p><strong>最後編輯時間:</strong> {new Date(p.updated_at).toLocaleString()}</p>
             </div>
           </div>
         ))}

@@ -1,9 +1,11 @@
 "use client";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function SignIn() {
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -13,8 +15,12 @@ export default function SignIn() {
       username: formData.get("username"),
       password: formData.get("password"),
     });
-    if (res?.error) setError("登入失敗");
-    else window.location.href = "/admin/dashboard";
+
+    if (res?.error) {
+      setError("登入失敗");
+    } else {
+      router.push("/admin/menu"); // 登入成功後跳轉到選擇頁面
+    }
   };
 
   return (

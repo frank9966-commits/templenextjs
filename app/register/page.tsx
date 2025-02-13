@@ -178,8 +178,6 @@ export default function RegisterStep() {
               <button onClick={handleCheckId} className="btn btn-secondary w-full mb-4">
                 查詢資料
               </button>
-              {/* 顯示錯誤或提示訊息 */}
-              {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
               {basicInfo && (
                 <div className="card mt-6 shadow-lg bg-base-50">
@@ -231,22 +229,20 @@ export default function RegisterStep() {
                       <button
                         type="button"
                         onClick={() => setSelectedParticipate(true)}
-                        className={`btn w-1/2 mr-2 ${
-                          selectedParticipate === true
+                        className={`btn w-1/2 mr-2 ${selectedParticipate === true
                             ? "btn-success hover:bg-green-700"
                             : "btn-outline hover:bg-green-700"
-                        }`}
+                          }`}
                       >
                         參加
                       </button>
                       <button
                         type="button"
                         onClick={() => setSelectedParticipate(false)}
-                        className={`btn w-1/2 ml-2 ${
-                          selectedParticipate === false
+                        className={`btn w-1/2 ml-2 ${selectedParticipate === false
                             ? "btn-error hover:bg-red-700"
                             : "btn-outline hover:bg-red-700"
-                        }`}
+                          }`}
                       >
                         不參加
                       </button>
@@ -255,6 +251,9 @@ export default function RegisterStep() {
                     <button onClick={handleSubmit} className="btn btn-primary w-full mt-4">
                       送出報名
                     </button>
+                    {/* 顯示錯誤或提示訊息 */}
+                    {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
                   </div>
                 </div>
               )}
@@ -310,22 +309,20 @@ export default function RegisterStep() {
                 <button
                   type="button"
                   onClick={() => setSelectedParticipate(true)}
-                  className={`btn w-1/2 mr-2 ${
-                    selectedParticipate === true
+                  className={`btn w-1/2 mr-2 ${selectedParticipate === true
                       ? "btn-success hover:bg-green-700"
                       : "btn-outline hover:bg-green-700"
-                  }`}
+                    }`}
                 >
                   參加
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedParticipate(false)}
-                  className={`btn w-1/2 ml-2 ${
-                    selectedParticipate === false
+                  className={`btn w-1/2 ml-2 ${selectedParticipate === false
                       ? "btn-error hover:bg-red-700"
                       : "btn-outline hover:bg-red-700"
-                  }`}
+                    }`}
                 >
                   不參加
                 </button>
