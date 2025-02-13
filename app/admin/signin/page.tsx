@@ -12,15 +12,17 @@ export default function SignIn() {
     const formData = new FormData(e.currentTarget);
     const res = await signIn("credentials", {
       redirect: false,
-      username: formData.get("username"),
+      id_card: formData.get("id_card"),
       password: formData.get("password"),
     });
 
-    if (res?.error) {
-      setError("登入失敗");
-    } else {
-      router.push("/admin/menu"); // 登入成功後跳轉到選擇頁面
+    // ✅ 這裡處理錯誤
+    if (!res?.ok) {
+      setError("登入失敗：請檢查身分證或密碼");
+      return;
     }
+
+    router.push("/admin/menu"); // 登入成功後跳轉
   };
 
   return (
@@ -32,8 +34,8 @@ export default function SignIn() {
             <div className="form-control">
               <input
                 type="text"
-                name="username"
-                placeholder="使用者名稱"
+                name="id_card"
+                placeholder="身分證"
                 className="input input-bordered w-full"
               />
             </div>
