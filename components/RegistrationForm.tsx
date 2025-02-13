@@ -102,7 +102,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text">生日</span>
+            <span className="label-text">生辰</span>
           </label>
           <input
             type="text"

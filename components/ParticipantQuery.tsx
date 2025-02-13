@@ -185,7 +185,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   </div>
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text">生日</span>
+                      <span className="label-text">生辰</span>
                     </label>
                     <input
                       type="text"
@@ -294,10 +294,10 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                               }
                             />
                           </div>
-                          {/* 生日 */}
+                          {/* 生辰 */}
                           <div className="form-control">
                             <label className="label">
-                              <span className="label-text">生日</span>
+                              <span className="label-text">生辰</span>
                             </label>
                             <input
                               type="text"

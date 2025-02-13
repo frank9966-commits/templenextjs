@@ -48,7 +48,7 @@ export default function AdminDashboard() {
               <h2 className="card-title text-lg font-bold">{p.name}</h2>
               <p><strong>身分證:</strong> {p.id_card}</p>
               <p><strong>地址:</strong> {p.address || "-"}</p>
-              <p><strong>生日:</strong> {p.birthday || "-"}</p>
+              <p><strong>生辰:</strong> {p.birthday || "-"}</p>
               <p><strong>參加活動名稱:</strong> {p.events ? p.events.title : "-"}</p>
               <p>
                 <strong>是否參加:</strong>{" "}
