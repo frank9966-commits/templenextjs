@@ -44,6 +44,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       family_id: familyId,
       participation_status: participationStatus, // 直接用字串
     };
+    console.log(participantData)
 
     // 檢查是否已存在該 id
     const { data: existed, error: fetchError } = await supabase
