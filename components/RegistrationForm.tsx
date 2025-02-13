@@ -18,6 +18,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
   const [birthday, setBirthday] = useState("");
   const [familyId, setFamilyId] = useState("");
   const [zodiacSign, setZodiacSign] = useState("");
+  const [eventDate, setEventDate] = useState("");
 
   // participationStatus可以是null，表示還沒選擇；或是 "join"/"none"/"agent"
   const [participationStatus, setParticipationStatus] = useState<ParticipationStatus | null>(null);
@@ -43,6 +44,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       zodiac_sign: zodiacSign,
       family_id: familyId,
       participation_status: participationStatus, // 直接用字串
+      event_date: eventDate,
     };
     console.log(participantData)
 
@@ -163,6 +165,19 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
             placeholder="代表人身分證字號"
             value={familyId}
             onChange={(e) => setFamilyId(e.target.value)}
+            className="input input-bordered w-full"
+          />
+        </div>
+
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text">參加日期</span>
+          </label>
+          <input
+            type="text"
+            placeholder="參加日期"
+            value={eventDate}
+            onChange={(e) => setEventDate(e.target.value)}
             className="input input-bordered w-full"
           />
         </div>
