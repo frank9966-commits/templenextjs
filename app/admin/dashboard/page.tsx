@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface Participant {
   id: number;
@@ -18,6 +20,16 @@ interface Participant {
 }
 
 export default function AdminDashboard() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "loading") return;
+    if (!session || session.user.role !== "admin") {
+      router.push("/signin"); // 如果不是管理員，導向登入頁
+    }
+  }, [session, status, router]);
+
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [error, setError] = useState<string>("");
 

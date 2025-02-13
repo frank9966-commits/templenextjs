@@ -10,16 +10,17 @@ export default function SignIn() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+
     const res = await signIn("credentials", {
       redirect: false,
-      username: formData.get("username"),
-      password: formData.get("password"),
+      id_card: formData.get("id_card"), // 身分證號
+      password: formData.get("password"), // 固定密碼
     });
 
     if (res?.error) {
-      setError("登入失敗");
+      setError("登入失敗，請檢查身分證號或密碼");
     } else {
-      router.push("/admin/menu"); // 登入成功後跳轉到選擇頁面
+      router.push("/admin/menu"); // 登入成功後跳轉到管理頁面
     }
   };
 
@@ -32,8 +33,8 @@ export default function SignIn() {
             <div className="form-control">
               <input
                 type="text"
-                name="username"
-                placeholder="使用者名稱"
+                name="id_card"
+                placeholder="請輸入身分證號"
                 className="input input-bordered w-full"
               />
             </div>
@@ -41,8 +42,9 @@ export default function SignIn() {
               <input
                 type="password"
                 name="password"
-                placeholder="密碼"
+                placeholder="請輸入密碼"
                 className="input input-bordered w-full"
+                defaultValue="password" // 預設密碼
               />
             </div>
             {error && <p className="text-red-500 text-center">{error}</p>}
