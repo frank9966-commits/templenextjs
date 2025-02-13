@@ -156,11 +156,11 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text">關係人 (家族代號)</span>
+            <span className="label-text">代表人身分證字號</span>
           </label>
           <input
             type="text"
-            placeholder="家族代號"
+            placeholder="代表人身分證字號"
             value={familyId}
             onChange={(e) => setFamilyId(e.target.value)}
             className="input input-bordered w-full"
