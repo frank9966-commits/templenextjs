@@ -1,9 +1,16 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { SupabaseAdapter } from "@next-auth/supabase-adapter";
 import { supabase } from "@/lib/supabaseClient"; // 確保這個路徑正確
 
-const authOptions = {
+// ✅ 允許 `name` 為 `string | null`
+interface CustomUser extends User {
+  id: string;
+  name: string | null;
+  role: string;
+}
+
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -11,7 +18,7 @@ const authOptions = {
         id_card: { label: "身分證", type: "text", placeholder: "輸入身分證" },
         password: { label: "密碼", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials): Promise<CustomUser | null> {
         if (!credentials?.id_card || !credentials?.password) {
           throw new Error("請輸入身分證與密碼");
         }
@@ -33,9 +40,9 @@ const authOptions = {
         }
 
         return {
-          id: user.id_card, // 這裡回傳 id_card 作為使用者 ID
-          name: user.name,
-          role: user.role || "user", // 如果有 role 欄位，可以存取
+          id: user.id_card,
+          name: user.name || null, // 確保 name 為 string | null
+          role: user.role || "user",
         };
       },
     }),
@@ -48,7 +55,7 @@ const authOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = user.role; // 把 role 存到 token
+        token.role = (user as CustomUser).role; // 顯式轉型
       }
       return token;
     },

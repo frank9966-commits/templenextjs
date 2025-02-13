@@ -70,11 +70,11 @@ export default function AdminDashboard() {
             <div key={p.id} className={`card bg-base-100 shadow-lg ${highlight}`}>
               <div className="card-body">
                 <h2 className="card-title text-lg font-bold">{p.name}</h2>
+                <p><strong>參加活動名稱:</strong> {p.events ? p.events.title : "-"}</p>
                 <p><strong>身分證:</strong> {p.id_card}</p>
                 <p><strong>地址:</strong> {p.address || "-"}</p>
                 <p><strong>生辰:</strong> {p.birthday || "-"}</p>
                 <p><strong>生肖:</strong> {p.zodiac_sign || "-"}</p>
-                <p><strong>參加活動名稱:</strong> {p.events ? p.events.title : "-"}</p>
                 <p>
                   <strong>是否參加:</strong>{" "}
                   {p.participation_status === "join" ? (
