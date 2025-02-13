@@ -314,7 +314,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                       : "btn-outline"
                       }`}
                   >
-                    代理
+                    代辦
                   </button>
                 </div>
 
@@ -444,7 +444,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                               : "btn-outline"
                               }`}
                           >
-                            代理
+                            代辦
                           </button>
                         </div>
                         <button
