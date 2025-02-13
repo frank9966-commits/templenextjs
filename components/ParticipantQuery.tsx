@@ -66,7 +66,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
           .select("*")
           .eq("family_id", data.family_id);
         if (familyError) {
-          setError("無法取得關係人資料：" + familyError.message);
+          setError("無法取得代表人身分證字號資料：" + familyError.message);
           setFamilyMembers([]);
         } else {
           setFamilyMembers(familyData);
@@ -266,7 +266,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                 </div>
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">關係人 (家族代號)</span>
+                    <span className="label-text">代表人身分證字號</span>
                   </label>
                   <input
                     type="text"
@@ -330,7 +330,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
             {/* 顯示家族成員編輯區塊 */}
             {familyMembers.length > 0 && (
               <div className="space-y-4">
-                <h2 className="text-lg font-bold">關係人名單 (可編輯)</h2>
+                <h2 className="text-lg font-bold">代表人身分證字號</h2>
                 <ul className="space-y-4">
                   {familyMembers.map((member, index) => (
                     <li key={member.id_card} className="p-2 rounded shadow">
@@ -396,7 +396,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                         </div>
                         <div className="form-control">
                           <label className="label">
-                            <span className="label-text">關係人 (家族代號)</span>
+                            <span className="label-text">代表人身分證字號</span>
                           </label>
                           <input
                             type="text"
