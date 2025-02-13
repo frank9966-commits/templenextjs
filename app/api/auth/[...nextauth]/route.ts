@@ -1,9 +1,9 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { SupabaseAdapter } from "@next-auth/supabase-adapter";
 import { supabase } from "@/lib/supabaseClient"; // 確保這個路徑正確
 
-export const authOptions: NextAuthOptions = {
+const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -13,7 +13,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.id_card || !credentials?.password) {
-          return null;
+          throw new Error("請輸入身分證與密碼");
         }
 
         // 查詢 Supabase 取得使用者
@@ -24,23 +24,18 @@ export const authOptions: NextAuthOptions = {
           .single();
 
         if (error || !user) {
-          throw null;
+          throw new Error("找不到使用者");
         }
 
         // ✅ 直接比對密碼，不加密
         if (credentials.password !== user.password) {
-          throw null;
-        }
-
-        // ✅ 只有 `role` 是 `admin` 的使用者可以登入
-        if (user.role !== "admin") {
-          return null; // 這裡一樣 return null
+          throw new Error("密碼錯誤");
         }
 
         return {
           id: user.id_card, // 這裡回傳 id_card 作為使用者 ID
           name: user.name,
-          role: user.role, // 如果有 role 欄位，可以存取
+          role: user.role || "user", // 如果有 role 欄位，可以存取
         };
       },
     }),
@@ -64,5 +59,6 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
+// ✅ 只導出 `handler`，不要導出 `authOptions`
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
