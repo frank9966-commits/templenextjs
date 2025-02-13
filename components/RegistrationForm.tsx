@@ -16,19 +16,27 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
   const [familyId, setFamilyId] = useState("");
   const [selectedParticipate, setSelectedParticipate] = useState<boolean | null>(null);
   const [error, setError] = useState("");
+  const [zodiacSign, setZodiacSign] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
+    // 檢查必填欄位
+    if (!idCard || !basicInfo?.name || !address || !birthday || selectedParticipate === null) {
+      setError("所有欄位皆為必填，請完整填寫表單。");
+      return;
+    }
+
     const participantData = {
       id_card: idCard,
-      name: basicInfo ? basicInfo.name : "請自行輸入姓名",
+      name: basicInfo.name,
       address,
       birthday,
       event_id: currentEvent.id,
+      zodiac_sign: zodiacSign,
       family_id: familyId,
-      participation_status: selectedParticipate ? "join" : "none", // 加入參加狀態
+      participation_status: selectedParticipate ? "join" : "none",
     };
 
     // 檢查是否已存在該 id
@@ -50,10 +58,10 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
         // 參加者才顯示付款資訊
         if (selectedParticipate) {
           alert(
-            `名子: ${basicInfo?.name || participantData.name} 註冊與報名成功！\n\n報名成功，記得繳交費用。\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
+            `名子: ${basicInfo.name} 註冊與報名成功！\n\n報名成功，記得繳交費用。\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
           );
         } else {
-          alert(`名子: ${basicInfo?.name || participantData.name} 註冊與報名成功！`);
+          alert(`名子: ${basicInfo.name} 註冊與報名成功！`);
         }
         window.location.reload();
       }
@@ -63,6 +71,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       router.push("/");
     }
   };
+
 
 
   return (
@@ -117,6 +126,20 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
             placeholder="範例：八十四年四月二十七日 亥時。"
             value={birthday}
             onChange={(e) => setBirthday(e.target.value)}
+            className="input input-bordered w-full"
+          />
+          <p className=" text-xs mt-2">範例：八十四年四月二十七日 亥時</p>
+        </div>
+
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text">生肖</span>
+          </label>
+          <input
+            type="text"
+            placeholder="輸入您的生肖"
+            value={zodiacSign}
+            onChange={(e) => setZodiacSign(e.target.value)}
             className="input input-bordered w-full"
           />
         </div>

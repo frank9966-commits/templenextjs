@@ -14,6 +14,7 @@ export interface Participant {
   family_id?: string;
   event_id?: number;
   participation_status?: "join" | "none" | "agent";
+  zodiac_sign?: string;
 }
 
 const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _currentEvent }) => {
@@ -27,6 +28,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     birthday?: string;
     family_id?: string;
     participation_status?: "join" | "none" | "agent";
+    zodiac_sign?: string;
   } | null>(null);
   const [error, setError] = useState("");
   const [familyMembers, setFamilyMembers] = useState<Participant[]>([]);
@@ -53,6 +55,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
         birthday: data.birthday,
         family_id: data.family_id,
         participation_status: data.participation_status,
+        zodiac_sign: data.zodiac_sign,
       });
       setError("");
 
@@ -96,6 +99,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
         birthday: member.birthday,
         participation_status: member.participation_status,
         family_id: member.family_id,
+        zodiac_sign: member.zodiac_sign,
       })
       .eq("id_card", member.id_card);
 
@@ -117,6 +121,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
         birthday: basicInfo.birthday,
         family_id: basicInfo.family_id,
         participation_status: basicInfo.participation_status,
+        zodiac_sign: basicInfo.zodiac_sign,
       })
       .eq("id_card", idCard);
     if (error) {
@@ -151,216 +156,243 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
         {basicInfo && (
           <div className="card shadow-lg bg-base-50 mt-4">
             {/* <div className="card-body"> */}
-              {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
-              {/* 若無家族成員，顯示編輯基本資料表單 */}
-              {familyMembers.length === 0 && (
-                <div className="mb-4">
-                  <h2 className="text-lg font-bold">修改基本資料</h2>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text">姓名</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={basicInfo.name}
-                      onChange={(e) =>
-                        setBasicInfo({ ...basicInfo, name: e.target.value })
-                      }
-                      className="input input-bordered w-full"
-                    />
-                  </div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text">地址</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={basicInfo.address || ""}
-                      onChange={(e) =>
-                        setBasicInfo({ ...basicInfo, address: e.target.value })
-                      }
-                      className="input input-bordered w-full"
-                    />
-                  </div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text">生辰</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={basicInfo.birthday || ""}
-                      onChange={(e) =>
-                        setBasicInfo({ ...basicInfo, birthday: e.target.value })
-                      }
-                      className="input input-bordered w-full"
-                    />
-                  </div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text">家族代號</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={basicInfo.family_id || ""}
-                      onChange={(e) =>
-                        setBasicInfo({ ...basicInfo, family_id: e.target.value })
-                      }
-                      className="input input-bordered w-full"
-                    />
-                  </div>
-                  {/* 新增參加狀態選擇 */}
-                  <div className="flex gap-2 mt-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setBasicInfo({ ...basicInfo, participation_status: "join" })
-                      }
-                      className={`btn w-1/3 ${basicInfo.participation_status === "join"
-                          ? "btn-success"
-                          : "btn-outline"
-                        }`}
-                    >
-                      參加
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setBasicInfo({ ...basicInfo, participation_status: "none" })
-                      }
-                      className={`btn w-1/3 ${basicInfo.participation_status === "none"
-                          ? "btn-error"
-                          : "btn-outline"
-                        }`}
-                    >
-                      不參加
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setBasicInfo({ ...basicInfo, participation_status: "agent" })
-                      }
-                      className={`btn w-1/3 ${basicInfo.participation_status === "agent"
-                          ? "btn-warning"
-                          : "btn-outline"
-                        }`}
-                    >
-                      代理
-                    </button>
-                  </div>
-
+            {/* 若無家族成員，顯示編輯基本資料表單 */}
+            {familyMembers.length === 0 && (
+              <div className="mb-4">
+                <h2 className="text-lg font-bold">修改基本資料</h2>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">姓名</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={basicInfo.name}
+                    onChange={(e) =>
+                      setBasicInfo({ ...basicInfo, name: e.target.value })
+                    }
+                    className="input input-bordered w-full"
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">地址</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={basicInfo.address || ""}
+                    onChange={(e) =>
+                      setBasicInfo({ ...basicInfo, address: e.target.value })
+                    }
+                    className="input input-bordered w-full"
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">生辰</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={basicInfo.birthday || ""}
+                    onChange={(e) =>
+                      setBasicInfo({ ...basicInfo, birthday: e.target.value })
+                    }
+                    className="input input-bordered w-full"
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">生肖</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="輸入您的生肖"
+                    value={basicInfo?.zodiac_sign || ""}
+                    onChange={(e) =>
+                      setBasicInfo({ ...basicInfo, zodiac_sign: e.target.value })
+                    }
+                    className="input input-bordered w-full"
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">家族代號</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={basicInfo.family_id || ""}
+                    onChange={(e) =>
+                      setBasicInfo({ ...basicInfo, family_id: e.target.value })
+                    }
+                    className="input input-bordered w-full"
+                  />
+                </div>
+                {/* 新增參加狀態選擇 */}
+                <div className="flex gap-2 mt-2">
                   <button
-                    onClick={handleUpdateBasicInfo}
-                    className="btn btn-primary w-full mt-2"
+                    type="button"
+                    onClick={() =>
+                      setBasicInfo({ ...basicInfo, participation_status: "join" })
+                    }
+                    className={`btn w-1/3 ${basicInfo.participation_status === "join"
+                      ? "btn-success"
+                      : "btn-outline"
+                      }`}
                   >
-                    更新基本資料
+                    參加
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setBasicInfo({ ...basicInfo, participation_status: "none" })
+                    }
+                    className={`btn w-1/3 ${basicInfo.participation_status === "none"
+                      ? "btn-error"
+                      : "btn-outline"
+                      }`}
+                  >
+                    不參加
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setBasicInfo({ ...basicInfo, participation_status: "agent" })
+                    }
+                    className={`btn w-1/3 ${basicInfo.participation_status === "agent"
+                      ? "btn-warning"
+                      : "btn-outline"
+                      }`}
+                  >
+                    代理
                   </button>
                 </div>
-              )}
 
-              {/* 顯示家族成員編輯區塊 */}
-              {familyMembers.length > 0 && (
-                <div className="space-y-4">
-                  <h2 className="text-lg font-bold">關係人名單 (可編輯)</h2>
-                  <ul className="space-y-4">
-                    {familyMembers.map((member, index) => (
-                      <li key={member.id_card} className="p-2 rounded shadow">
-                        <div className="flex flex-col space-y-2">
-                          {/* 姓名 */}
-                          <div className="form-control">
-                            <label className="label">
-                              <span className="label-text">姓名</span>
-                            </label>
-                            <input
-                              type="text"
-                              className="input input-bordered"
-                              value={member.name || ""}
-                              onChange={(e) =>
-                                handleFamilyMemberChange(index, "name", e.target.value)
-                              }
-                            />
-                          </div>
-                          {/* 地址 */}
-                          <div className="form-control">
-                            <label className="label">
-                              <span className="label-text">地址</span>
-                            </label>
-                            <input
-                              type="text"
-                              className="input input-bordered"
-                              value={member.address || ""}
-                              onChange={(e) =>
-                                handleFamilyMemberChange(index, "address", e.target.value)
-                              }
-                            />
-                          </div>
-                          {/* 生辰 */}
-                          <div className="form-control">
-                            <label className="label">
-                              <span className="label-text">生辰</span>
-                            </label>
-                            <input
-                              type="text"
-                              className="input input-bordered"
-                              value={member.birthday || ""}
-                              onChange={(e) =>
-                                handleFamilyMemberChange(index, "birthday", e.target.value)
-                              }
-                            />
-                          </div>
-                          {/* 參加狀態 */}
-                          <div className="flex gap-2 py-2">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleFamilyMemberChange(index, "participation_status", "join")
-                              }
-                              className={`btn w-1/3 ${member.participation_status === "join"
-                                  ? "btn-success"
-                                  : "btn-outline"
-                                }`}
-                            >
-                              參加
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleFamilyMemberChange(index, "participation_status", "none")
-                              }
-                              className={`btn w-1/3 ${member.participation_status === "none"
-                                  ? "btn-error"
-                                  : "btn-outline"
-                                }`}
-                            >
-                              不參加
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleFamilyMemberChange(index, "participation_status", "agent")
-                              }
-                              className={`btn w-1/3 ${member.participation_status === "agent"
-                                  ? "btn-warning"
-                                  : "btn-outline"
-                                }`}
-                            >
-                              代理
-                            </button>
-                          </div>
+                <button
+                  onClick={handleUpdateBasicInfo}
+                  className="btn btn-primary w-full mt-2"
+                >
+                  更新基本資料
+                </button>
+              </div>
+            )}
+
+            {/* 顯示家族成員編輯區塊 */}
+            {familyMembers.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-lg font-bold">關係人名單 (可編輯)</h2>
+                <ul className="space-y-4">
+                  {familyMembers.map((member, index) => (
+                    <li key={member.id_card} className="p-2 rounded shadow">
+                      <div className="flex flex-col space-y-2">
+                        {/* 姓名 */}
+                        <div className="form-control">
+                          <label className="label">
+                            <span className="label-text">姓名</span>
+                          </label>
+                          <input
+                            type="text"
+                            className="input input-bordered"
+                            value={member.name || ""}
+                            onChange={(e) =>
+                              handleFamilyMemberChange(index, "name", e.target.value)
+                            }
+                          />
+                        </div>
+                        {/* 地址 */}
+                        <div className="form-control">
+                          <label className="label">
+                            <span className="label-text">地址</span>
+                          </label>
+                          <input
+                            type="text"
+                            className="input input-bordered"
+                            value={member.address || ""}
+                            onChange={(e) =>
+                              handleFamilyMemberChange(index, "address", e.target.value)
+                            }
+                          />
+                        </div>
+                        {/* 生辰 */}
+                        <div className="form-control">
+                          <label className="label">
+                            <span className="label-text">生辰</span>
+                          </label>
+                          <input
+                            type="text"
+                            className="input input-bordered"
+                            value={member.birthday || ""}
+                            onChange={(e) =>
+                              handleFamilyMemberChange(index, "birthday", e.target.value)
+                            }
+                          />
+                        </div>
+                        <div className="form-control">
+                          <label className="label">
+                            <span className="label-text">生肖</span>
+                          </label>
+                          <input
+                            type="text"
+                            className="input input-bordered"
+                            value={member.zodiac_sign || ""}
+                            onChange={(e) =>
+                              handleFamilyMemberChange(index, "zodiac_sign", e.target.value)
+                            }
+                          />
+                        </div>
+                        {/* 參加狀態 */}
+                        <div className="flex gap-2 py-2">
                           <button
                             type="button"
-                            onClick={() => handleUpdateMember(member)}
-                            className="btn btn-primary w-full"
+                            onClick={() =>
+                              handleFamilyMemberChange(index, "participation_status", "join")
+                            }
+                            className={`btn w-1/3 ${member.participation_status === "join"
+                              ? "btn-success"
+                              : "btn-outline"
+                              }`}
                           >
-                            更新
+                            參加
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleFamilyMemberChange(index, "participation_status", "none")
+                            }
+                            className={`btn w-1/3 ${member.participation_status === "none"
+                              ? "btn-error"
+                              : "btn-outline"
+                              }`}
+                          >
+                            不參加
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleFamilyMemberChange(index, "participation_status", "agent")
+                            }
+                            className={`btn w-1/3 ${member.participation_status === "agent"
+                              ? "btn-warning"
+                              : "btn-outline"
+                              }`}
+                          >
+                            代理
                           </button>
                         </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateMember(member)}
+                          className="btn btn-primary w-full"
+                        >
+                          提交
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
           // </div>
         )}
       </div>
