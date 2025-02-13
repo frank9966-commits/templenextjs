@@ -99,12 +99,12 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       .order("created_at", { ascending: false })
       .limit(1)
       .single();
-  
+
     if (eventError || !latestEvent) {
       alert("無法取得最新活動資訊");
       return;
     }
-  
+
     const updatedData = {
       name: member.name || "未填寫",
       address: member.address || "未填寫",
@@ -115,27 +115,27 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       event_id: latestEvent.id, // ✅ 確保 `event_id` 是最新活動
       admin_viewed: false,
     };
-  
+
     console.log("更新家族成員資料:", updatedData);
-  
+
     const { error } = await supabase
       .from("participants")
       .update(updatedData)
       .eq("id_card", member.id_card)
-  
+
     if (error) {
       alert("更新失敗：" + error.message);
     } else {
       alert("更新成功！");
     }
   };
-  
+
 
 
   // 更新基本資料（沒有家族成員時使用）
   const handleUpdateBasicInfo = async () => {
     if (!basicInfo) return;
-  
+
     // ✅ 先查詢最新活動 ID
     const { data: latestEvent, error: eventError } = await supabase
       .from("events")
@@ -143,12 +143,12 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       .order("created_at", { ascending: false })
       .limit(1)
       .single();
-  
+
     if (eventError || !latestEvent) {
       alert("無法取得最新活動資訊");
       return;
     }
-  
+
     const updatedData = {
       name: basicInfo.name || "未填寫",
       address: basicInfo.address || "未填寫",
@@ -159,21 +159,21 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       event_id: latestEvent.id, // ✅ 確保 `event_id` 是最新活動
       admin_viewed: false,
     };
-  
+
     console.log("更新資料:", updatedData);
-  
+
     const { error } = await supabase
       .from("participants")
       .update(updatedData)
       .eq("id_card", idCard)
-  
+
     if (error) {
       alert("更新基本資料失敗：" + error.message);
     } else {
       alert("基本資料更新成功！");
     }
   };
-  
+
 
 
   return (
@@ -266,7 +266,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                 </div>
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">家族代號</span>
+                    <span className="label-text">關係人 (家族代號)</span>
                   </label>
                   <input
                     type="text"
@@ -392,6 +392,20 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             onChange={(e) =>
                               handleFamilyMemberChange(index, "zodiac_sign", e.target.value)
                             }
+                          />
+                        </div>
+                        <div className="form-control">
+                          <label className="label">
+                            <span className="label-text">關係人 (家族代號)</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={basicInfo.family_id || ""}
+                            required
+                            onChange={(e) =>
+                              setBasicInfo({ ...basicInfo, family_id: e.target.value })
+                            }
+                            className="input input-bordered w-full"
                           />
                         </div>
                         {/* 參加狀態 */}
