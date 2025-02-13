@@ -150,7 +150,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
 
         {basicInfo && (
           <div className="card shadow-lg bg-base-50 mt-4">
-            <div className="card-body">
+            {/* <div className="card-body"> */}
               {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
               {/* 若無家族成員，顯示編輯基本資料表單 */}
@@ -309,7 +309,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             />
                           </div>
                           {/* 參加狀態 */}
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 py-2">
                             <button
                               type="button"
                               onClick={() =>
@@ -361,7 +361,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                 </div>
               )}
             </div>
-          </div>
+          // </div>
         )}
       </div>
     </div>
