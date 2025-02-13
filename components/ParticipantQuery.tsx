@@ -122,7 +122,6 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       .from("participants")
       .update(updatedData)
       .eq("id_card", member.id_card)
-      .eq("event_id", latestEvent.id); // ✅ 確保更新的是最新活動
   
     if (error) {
       alert("更新失敗：" + error.message);
@@ -167,7 +166,6 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       .from("participants")
       .update(updatedData)
       .eq("id_card", idCard)
-      .eq("event_id", latestEvent.id); // ✅ 確保更新的是最新活動
   
     if (error) {
       alert("更新基本資料失敗：" + error.message);
