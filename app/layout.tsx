@@ -25,13 +25,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* 可以在此放入 Header 並放置回首頁按鈕 */}
-        <header className="p-4 bg-base-200">
+    <html lang="en" className="h-full">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen`}
+      >
+        <header className="w-full p-4 bg-base-200 flex justify-center">
           <HomeButton />
         </header>
-        {children}
+
+        <main className="flex-1 flex items-center justify-center w-full">
+          {children}
+        </main>
       </body>
     </html>
   );
