@@ -309,6 +309,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             type="text"
                             className="input input-bordered"
                             value={member.name || ""}
+                            required
                             onChange={(e) =>
                               handleFamilyMemberChange(index, "name", e.target.value)
                             }
@@ -323,6 +324,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             type="text"
                             className="input input-bordered"
                             value={member.address || ""}
+                            required
                             onChange={(e) =>
                               handleFamilyMemberChange(index, "address", e.target.value)
                             }
@@ -337,6 +339,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             type="text"
                             className="input input-bordered"
                             value={member.birthday || ""}
+                            required
                             onChange={(e) =>
                               handleFamilyMemberChange(index, "birthday", e.target.value)
                             }
@@ -349,6 +352,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                           <input
                             type="text"
                             className="input input-bordered"
+                            required
                             value={member.zodiac_sign || ""}
                             onChange={(e) =>
                               handleFamilyMemberChange(index, "zodiac_sign", e.target.value)
