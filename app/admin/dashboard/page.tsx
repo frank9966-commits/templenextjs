@@ -15,17 +15,20 @@ interface Participant {
   admin_viewed: boolean;
   zodiac_sign?: string;
   events: { title: string } | null;
+  pay_status?: string;
 }
 
 export default function AdminDashboard() {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [error, setError] = useState<string>("");
 
+  // 取得參與者資料
   useEffect(() => {
     async function fetchParticipants() {
       const { data, error } = await supabase
         .from("participants")
         .select("*, events(title)");
+
       if (error) {
         setError("取得資料失敗：" + error.message);
       } else {
@@ -35,70 +38,134 @@ export default function AdminDashboard() {
     fetchParticipants();
   }, []);
 
-  // 標記使用者為已查看
-  const markAsViewed = async (id: number) => {
+  // ✅ 更新繳費狀態
+  const updatePayStatus = async (id: number, newStatus: string) => {
     const { error } = await supabase
       .from("participants")
-      .update({ admin_viewed: true })
+      .update({ pay_status: newStatus })
       .eq("id", id);
 
     if (!error) {
       setParticipants((prev) =>
-        prev.map((p) =>
-          p.id === id ? { ...p, admin_viewed: true } : p
-        )
+        prev.map((p) => (p.id === id ? { ...p, pay_status: newStatus } : p))
       );
+    } else {
+      console.error("更新繳費狀態失敗：", error);
+    }
+  };
+
+  // ✅ 標記為已查看 (修正錯誤)
+  const markAsViewed = async (id: number) => {
+    const { error } = await supabase
+      .from("participants")
+      .update({ admin_viewed: true }) // ✅ 更新 admin_viewed
+      .eq("id", id);
+
+    if (!error) {
+      setParticipants((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, admin_viewed: true } : p))
+      );
+    } else {
+      console.error("標記為已查看失敗：", error);
     }
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-4">
-      <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4 sticky top-0 bg-base-200 p-4 z-10">
-        報名狀況
+    <div className="w-full mx-auto p-4">
+      <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 sticky top-0 bg-base-200 p-4 z-10">
+        報名狀況總覽
       </h1>
       {error && <p className="text-red-500 text-center">{error}</p>}
 
-      {/* RWD 優化 + 滾動 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto max-h-[calc(100vh-150px)] p-2">
-        {participants.map((p) => {
-          const isEdited = new Date(p.created_at).getTime() !== new Date(p.updated_at).getTime();
-          const hasChanges = isEdited || (p.participation_status && p.participation_status !== "none");
+      {/* 表格呈現資料 */}
+      <div className="overflow-x-auto">
+        <table className="table-auto w-full border-collapse border border-gray-300">
+          <thead className="bg-gray-200">
+            <tr className="text-left">
+              {[
+                "姓名",
+                "活動名稱",
+                "身分證",
+                "地址",
+                "生辰",
+                "生肖",
+                "是否參加",
+                "關係人",
+                "創造日期",
+                "最後編輯",
+                "繳費狀態",
+                "管理",
+              ].map((header) => (
+                <th key={header} className="border border-gray-300 p-2">
+                  {header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {participants.map((p) => {
+              const isEdited =
+                new Date(p.created_at).getTime() !==
+                new Date(p.updated_at).getTime();
+              const hasChanges =
+                isEdited ||
+                (p.participation_status && p.participation_status !== "none");
+              const highlight =
+                !p.admin_viewed && hasChanges ? "bg-yellow-100" : "";
 
-          const highlight = (!p.admin_viewed && hasChanges) ? "border-4 border-yellow-500" : "";
+              return (
+                <tr key={p.id} className={`${highlight} border border-gray-300`}>
+                  <td className="border border-gray-300 p-2 font-bold">{p.name}</td>
+                  <td className="border border-gray-300 p-2">
+                    {p.events ? p.events.title : "-"}
+                  </td>
+                  <td className="border border-gray-300 p-2">{p.id_card}</td>
+                  <td className="border border-gray-300 p-2">{p.address || "-"}</td>
+                  <td className="border border-gray-300 p-2">{p.birthday || "-"}</td>
+                  <td className="border border-gray-300 p-2">{p.zodiac_sign || "-"}</td>
+                  <td className="border border-gray-300 p-2">
+                    {p.participation_status === "join" ? (
+                      <span className="text-green-600 font-semibold">參加</span>
+                    ) : (
+                      <span className="text-red-600 font-semibold">不參加</span>
+                    )}
+                  </td>
+                  <td className="border border-gray-300 p-2">{p.family_id || "-"}</td>
+                  <td className="border border-gray-300 p-2">
+                    {new Date(p.created_at).toLocaleString()}
+                  </td>
+                  <td className="border border-gray-300 p-2">
+                    {new Date(p.updated_at).toLocaleString()}
+                  </td>
 
-          return (
-            <div key={p.id} className={`card bg-base-100 shadow-lg ${highlight}`}>
-              <div className="card-body">
-                <h2 className="card-title text-lg font-bold">{p.name}</h2>
-                <p><strong>參加活動名稱:</strong> {p.events ? p.events.title : "-"}</p>
-                <p><strong>身分證:</strong> {p.id_card}</p>
-                <p><strong>地址:</strong> {p.address || "-"}</p>
-                <p><strong>生辰:</strong> {p.birthday || "-"}</p>
-                <p><strong>生肖:</strong> {p.zodiac_sign || "-"}</p>
-                <p>
-                  <strong>是否參加:</strong>{" "}
-                  {p.participation_status === "join" ? (
-                    <span className="text-green-600 font-semibold">參加</span>
-                  ) : (
-                    <span className="text-red-600 font-semibold">不參加</span>
-                  )}
-                </p>
-                <p><strong>關係人:</strong> {p.family_id || "-"}</p>
-                <p><strong>創造日期:</strong> {new Date(p.created_at).toLocaleString()}</p>
-                <p><strong>最後編輯時間:</strong> {new Date(p.updated_at).toLocaleString()}</p>
+                  {/* ✅ 繳費狀態，下拉選單切換 */}
+                  <td className="border border-gray-300 p-2">
+                    <select
+                      className="border p-1 rounded"
+                      value={p.pay_status || "未繳交"} // 預設值
+                      onChange={(e) => updatePayStatus(p.id, e.target.value)}
+                    >
+                      <option value="已繳交">已繳交</option>
+                      <option value="未繳交">未繳交</option>
+                    </select>
+                  </td>
 
-                {!p.admin_viewed && hasChanges && (
-                  <button
-                    onClick={() => markAsViewed(p.id)}
-                    className="btn btn-warning mt-2 w-full"
-                  >
-                    標記為已查看
-                  </button>
-                )}
-              </div>
-            </div>
-          );
-        })}
+                  {/* ✅ 修正「標記已查看」按鈕邏輯 */}
+                  <td className="border border-gray-300 p-2">
+                    {!p.admin_viewed && hasChanges && (
+                      <button
+                        onClick={() => markAsViewed(p.id)} // ✅ 改成正確的函式
+                        className="btn btn-warning w-full text-sm px-2 py-1"
+                      >
+                        標記已查看
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );

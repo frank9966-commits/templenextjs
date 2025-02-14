@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react"; // ✅ 加入 useSession()
 import { supabase } from "@/lib/supabaseClient";
 
 export default function Home() {
   const [title, setTitle] = useState("");
+  const { data: session } = useSession(); // ✅ 取得 session 狀態
 
   useEffect(() => {
     async function fetchTitle() {
@@ -35,9 +37,20 @@ export default function Home() {
               <a href="/register" className="btn btn-primary w-full sm:w-auto">
                 報名參加
               </a>
-              <a href="/admin/signin" className="btn btn-secondary w-full sm:w-auto">
-                管理後台
-              </a>
+
+              {/* ✅ 只有 `admin` 才能看到管理後台按鈕 */}
+              {session?.user?.role === "admin" && (
+                <a href="/admin" className="btn btn-secondary w-full sm:w-auto">
+                  管理後台
+                </a>
+              )}
+
+              {/* 如果未登入，則顯示登入按鈕 */}
+              {!session && (
+                <a href="/admin/signin" className="btn btn-secondary w-full sm:w-auto">
+                  管理員登入
+                </a>
+              )}
             </div>
           </div>
         </div>
