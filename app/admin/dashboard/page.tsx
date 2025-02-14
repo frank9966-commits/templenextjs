@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import ExportExcel from "@/components/ExportExcel"; // ✅ 引入 Excel 匯出元件
+
 
 interface Participant {
   id: number;
@@ -76,6 +78,9 @@ export default function AdminDashboard() {
         報名狀況總覽
       </h1>
       {error && <p className="text-red-500 text-center">{error}</p>}
+      <div className="text-right mb-4">
+        <ExportExcel data={participants} filename="報名資料.xlsx" />
+      </div>
 
       {/* 表格呈現資料 */}
       <div className="overflow-x-auto">
