@@ -94,18 +94,15 @@ export default function AdminDashboard() {
 
   return (
     <div className="w-full mx-auto p-4">
-      <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 sticky top-0 bg-base-200 p-4 z-10">
-        報名狀況總覽
-      </h1>
       {error && <p className="text-red-500 text-center">{error}</p>}
       <div className="text-right mb-4">
         <ExportExcel data={participants} filename="報名資料.xlsx" />
       </div>
 
       {/* 表格呈現資料 */}
-      <div className="overflow-x-auto">
+      <div className="overflow-auto max-h-[700px]">
         <table className="table-auto w-full border-collapse border border-gray-300">
-          <thead className="bg-gray-200">
+          <thead className="bg-gray-200 sticky top-0 z-20">
             <tr className="text-left">
               {[
                 "姓名",
