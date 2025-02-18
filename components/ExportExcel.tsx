@@ -15,6 +15,8 @@ interface Participant {
   zodiac_sign?: string;
   events: { title: string } | null;
   pay_status?: string;
+  event_date?: string;
+  memo?: string;
 }
 
 interface ExportExcelProps {
@@ -38,6 +40,8 @@ export default function ExportExcel({ data, filename = "報名資料.xlsx" }: Ex
       生肖: p.zodiac_sign || "-",
       是否參加: p.participation_status === "join" ? "參加" : "不參加",
       關係人: p.family_id || "-",
+      參加梯次: p.family_id || "-",
+      備註: p.memo || "-",
       創造日期: new Date(p.created_at).toLocaleString(),
       最後編輯: new Date(p.updated_at).toLocaleString(),
       繳費狀態: p.pay_status || "未繳交",

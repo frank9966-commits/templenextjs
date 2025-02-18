@@ -74,6 +74,24 @@ export default function AdminDashboard() {
     }
   };
 
+  // 刪除參與者
+  const deleteParticipant = async (id: number) => {
+    if (confirm("您確定要刪除此參與者嗎？")) {
+      const { error } = await supabase
+        .from("participants")
+        .delete()
+        .eq("id", id);
+
+      if (!error) {
+        // 從狀態中移除被刪除的參與者
+        setParticipants((prev) => prev.filter((p) => p.id !== id));
+      } else {
+        console.error("刪除參與者失敗：", error);
+      }
+    }
+  };
+
+
   return (
     <div className="w-full mx-auto p-4">
       <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 sticky top-0 bg-base-200 p-4 z-10">
@@ -109,6 +127,7 @@ export default function AdminDashboard() {
                   {header}
                 </th>
               ))}
+              <th className="border border-gray-300 p-2">刪除</th>
             </tr>
           </thead>
           <tbody>
@@ -171,6 +190,15 @@ export default function AdminDashboard() {
                         標記已查看
                       </button>
                     )}
+                  </td>
+                  {/* 刪除 */}
+                  <td className="border border-gray-300 p-2">
+                    <button
+                      onClick={() => deleteParticipant(p.id)}
+                      className="btn btn-danger w-full text-sm px-2 py-1"
+                    >
+                      刪除
+                    </button>
                   </td>
                 </tr>
               );
