@@ -44,7 +44,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       event_id: currentEvent.id,
       zodiac_sign: zodiacSign,
       family_id: familyId,
-      memo:memo,
+      memo: memo,
       participation_status: participationStatus, // 直接用字串
       event_date: eventDate,
     };
@@ -149,14 +149,27 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
           <label className="label">
             <span className="label-text">生肖</span>
           </label>
-          <input
-            type="text"
-            placeholder="輸入您的生肖"
+          <select
             value={zodiacSign}
             onChange={(e) => setZodiacSign(e.target.value)}
-            className="input input-bordered w-full"
-          />
+            className="select select-bordered w-full"
+          >
+            <option value="" disabled>請選擇您的生肖</option>
+            <option value="鼠">鼠</option>
+            <option value="牛">牛</option>
+            <option value="虎">虎</option>
+            <option value="兔">兔</option>
+            <option value="龍">龍</option>
+            <option value="蛇">蛇</option>
+            <option value="馬">馬</option>
+            <option value="羊">羊</option>
+            <option value="猴">猴</option>
+            <option value="雞">雞</option>
+            <option value="狗">狗</option>
+            <option value="豬">豬</option>
+          </select>
         </div>
+
 
         <div className="form-control">
           <label className="label">
