@@ -1,5 +1,5 @@
 // ParticipantQuery.tsx
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 interface ParticipantQueryProps {
@@ -16,6 +16,7 @@ export interface Participant {
   event_id?: number;
   participation_status?: "join" | "none" | "agent";
   zodiac_sign?: string;
+  memo?: string;
 }
 
 const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _currentEvent }) => {
@@ -32,6 +33,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     event_id?: number,
     event_date?: string,
     zodiac_sign?: string;
+    memo?: string;
   } | null>(null);
   const [error, setError] = useState("");
   const [familyMembers, setFamilyMembers] = useState<Participant[]>([]);
@@ -60,6 +62,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
         event_date: data.event_date,
         participation_status: data.participation_status,
         zodiac_sign: data.zodiac_sign,
+        memo: data.memo,
       });
       setError("");
 
@@ -116,6 +119,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       event_date: member.event_date || "未填寫",
       participation_status: member.participation_status || "none",
       zodiac_sign: member.zodiac_sign || "未填寫",
+      memo: member.memo || "未填寫",
       event_id: latestEvent.id, // ✅ 確保 `event_id` 是最新活動
       admin_viewed: false,
     };
@@ -161,6 +165,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       event_date: basicInfo.event_date || "event_date",
       participation_status: basicInfo.participation_status || "none",
       zodiac_sign: basicInfo.zodiac_sign || "未填寫",
+      memo: basicInfo.memo || "未填寫",
       event_id: latestEvent.id, // ✅ 確保 `event_id` 是最新活動
       admin_viewed: false,
     };
@@ -178,8 +183,6 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       alert(`基本資料更新成功！\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`);
     }
   };
-
-
 
   return (
     <div className="card w-full shadow-xl bg-base-100">
@@ -285,14 +288,34 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                 </div>
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">參加日期</span>
+                    <span className="label-text">參加梯次</span>
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={basicInfo.event_date || ""}
                     required
                     onChange={(e) =>
                       setBasicInfo({ ...basicInfo, event_date: e.target.value })
+                    }
+                    className="select select-bordered w-full"
+                  >
+                    <option value="" disabled>請選擇梯次</option>
+                    <option value="第一梯次">第一梯次</option>
+                    <option value="第二梯次">第二梯次</option>
+                    <option value="第三梯次">第三梯次</option>
+                    <option value="第四梯次">第四梯次</option>
+                    <option value="第五梯次">第五梯次</option>
+                  </select>
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">備註</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={basicInfo.memo || ""}
+                    required
+                    onChange={(e) =>
+                      setBasicInfo({ ...basicInfo, memo: e.target.value })
                     }
                     className="input input-bordered w-full"
                   />
@@ -354,7 +377,6 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   {familyMembers.map((member, index) => (
                     <li key={member.id_card} className="p-2 rounded shadow">
                       <div className="flex flex-col space-y-2">
-                        {/* 姓名 */}
                         <div className="form-control">
                           <label className="label">
                             <span className="label-text">姓名</span>
@@ -429,19 +451,26 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                         </div>
                         <div className="form-control">
                           <label className="label">
-                            <span className="label-text">參加日期</span>
+                            <span className="label-text">參加梯次</span>
                           </label>
-                          <input
-                            type="text"
+                          <select
                             value={basicInfo.event_date || ""}
                             required
                             onChange={(e) =>
                               setBasicInfo({ ...basicInfo, event_date: e.target.value })
                             }
-                            className="input input-bordered w-full"
-                          />
+                            className="select select-bordered w-full"
+                          >
+                            <option value="" disabled>請選擇梯次</option>
+                            <option value="第一梯次">第一梯次</option>
+                            <option value="第二梯次">第二梯次</option>
+                            <option value="第三梯次">第三梯次</option>
+                            <option value="第四梯次">第四梯次</option>
+                            <option value="第五梯次">第五梯次</option>
+                          </select>
                         </div>
-                        
+
+
                         {/* 參加狀態 */}
                         <div className="flex gap-2 py-2">
                           <button
