@@ -1,5 +1,5 @@
 // ParticipantQuery.tsx
-import React, { memo, useState } from "react";
+import React, { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 interface ParticipantQueryProps {
