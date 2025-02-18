@@ -16,8 +16,10 @@ interface Participant {
   family_id?: string;
   admin_viewed: boolean;
   zodiac_sign?: string;
+  event_date?: string;
   events: { title: string } | null;
   pay_status?: string;
+  memo?: string;
 }
 
 export default function AdminDashboard() {
@@ -95,7 +97,9 @@ export default function AdminDashboard() {
                 "生辰",
                 "生肖",
                 "是否參加",
+                "參加梯次",
                 "關係人",
+                "備註",
                 "創造日期",
                 "最後編輯",
                 "繳費狀態",
@@ -135,7 +139,9 @@ export default function AdminDashboard() {
                       <span className="text-red-600 font-semibold">不參加</span>
                     )}
                   </td>
+                  <td className="border border-gray-300 p-2">{p.event_date || "-"}</td>
                   <td className="border border-gray-300 p-2">{p.family_id || "-"}</td>
+                  <td className="border border-gray-300 p-2">{p.memo || "-"}</td>
                   <td className="border border-gray-300 p-2">
                     {new Date(p.created_at).toLocaleString()}
                   </td>

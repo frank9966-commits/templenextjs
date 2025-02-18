@@ -17,6 +17,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
   const [address, setAddress] = useState("");
   const [birthday, setBirthday] = useState("");
   const [familyId, setFamilyId] = useState("");
+  const [memo, setMemo] = useState("");
   const [zodiacSign, setZodiacSign] = useState("");
   const [eventDate, setEventDate] = useState("");
 
@@ -43,6 +44,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       event_id: currentEvent.id,
       zodiac_sign: zodiacSign,
       family_id: familyId,
+      memo:memo,
       participation_status: participationStatus, // 直接用字串
       event_date: eventDate,
     };
@@ -171,13 +173,31 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text">參加日期</span>
+            <span className="label-text">參加梯次</span>
+          </label>
+          <select
+            value={eventDate}
+            onChange={(e) => setEventDate(e.target.value)}
+            className="select select-bordered w-full"
+          >
+            <option value="" disabled>請選擇梯次</option>
+            <option value="第一梯次">第一梯次</option>
+            <option value="第二梯次">第二梯次</option>
+            <option value="第三梯次">第三梯次</option>
+            <option value="第四梯次">第四梯次</option>
+            <option value="第五梯次">第五梯次</option>
+          </select>
+        </div>
+
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text">備註</span>
           </label>
           <input
             type="text"
-            placeholder="參加日期"
-            value={eventDate}
-            onChange={(e) => setEventDate(e.target.value)}
+            placeholder="範例：神尊指示注意事項"
+            value={memo}
+            onChange={(e) => setMemo(e.target.value)}
             className="input input-bordered w-full"
           />
         </div>
