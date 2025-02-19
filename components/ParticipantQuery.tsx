@@ -38,15 +38,32 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
   const [error, setError] = useState("");
   const [familyMembers, setFamilyMembers] = useState<Participant[]>([]);
 
+  // 身分證驗證格式
+  // 驗證台灣身分證字號格式（1 個大寫英文字母 + 9 個數字）
+  const validateTaiwanIDFormat = (id: string): boolean => {
+    const pattern = /^[A-Z][0-9]{9}$/;
+    return pattern.test(id);
+  };
+
   // 查詢身分證資料
   const handleCheckId = async () => {
     if (!idCard) return;
     setError("");
 
+    // 將輸入轉換為大寫，避免因使用者輸入小寫導致驗證失敗
+    const normalizedId = idCard.toUpperCase();
+
+    // 使用 normalizedId 進行驗證
+    if (!validateTaiwanIDFormat(normalizedId)) {
+      setError("身分證格式不正確，請輸入正確格式（例如 A123456789）");
+      return;
+    }
+
+    // 以 normalizedId 查詢資料庫
     const { data, error } = await supabase
       .from("participants")
       .select("*")
-      .eq("id_card", idCard)
+      .eq("id_card", normalizedId)
       .single();
 
     if (error || !data) {

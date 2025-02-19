@@ -26,9 +26,25 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
 
   const [error, setError] = useState("");
 
+  // 身分證驗證格式
+  // 驗證台灣身分證字號格式（1 個大寫英文字母 + 9 個數字）
+  const validateTaiwanIDFormat = (id: string): boolean => {
+    const pattern = /^[A-Z][0-9]{9}$/;
+    return pattern.test(id);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    // 將輸入轉換為大寫，避免因使用者輸入小寫導致驗證失敗
+    const normalizedId = idCard.toUpperCase();
+
+    // 使用 normalizedId 進行驗證
+    if (!validateTaiwanIDFormat(normalizedId)) {
+      setError("身分證格式不正確，請輸入正確格式（例如 A123456789）");
+      return;
+    }
 
     // 檢查必填欄位 (參加狀態不能是 null)
     if (!idCard || !basicInfo?.name || !address || !birthday || !participationStatus) {
