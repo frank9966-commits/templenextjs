@@ -1,5 +1,5 @@
 // ParticipantQuery.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 interface ParticipantQueryProps {
@@ -37,6 +37,15 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
   } | null>(null);
   const [error, setError] = useState("");
   const [familyMembers, setFamilyMembers] = useState<Participant[]>([]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError("");
+      }, 5000); // 5000 毫秒 = 5 秒
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   // 身分證驗證格式
   // 驗證台灣身分證字號格式（1 個大寫英文字母 + 9 個數字）
