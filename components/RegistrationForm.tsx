@@ -231,13 +231,13 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
           <label className="label">
             <span className="label-text">備註</span>
           </label>
-          <input
-            type="text"
+          <textarea
             placeholder="範例：神尊指示注意事項"
             value={memo}
             onChange={(e) => setMemo(e.target.value)}
-            className="input input-bordered w-full"
+            className="textarea textarea-bordered w-full h-24"
           />
+
         </div>
 
         {/* 三個狀態按鈕 */}

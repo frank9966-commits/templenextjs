@@ -348,16 +348,17 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   <label className="label">
                     <span className="label-text">備註</span>
                   </label>
-                  <input
-                    type="text"
+                  <textarea
                     value={basicInfo.memo || ""}
                     required
                     onChange={(e) =>
                       setBasicInfo({ ...basicInfo, memo: e.target.value })
                     }
-                    className="input input-bordered w-full"
+                    className="textarea textarea-bordered w-full h-24"
+                    placeholder="請輸入備註..."
                   />
                 </div>
+
                 {/* 新增參加狀態選擇 */}
                 <div className="flex gap-2 mt-2">
                   <button
@@ -520,7 +521,20 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             <option value="第五梯次">第五梯次</option>
                           </select>
                         </div>
-
+                        <div className="form-control">
+                          <label className="label">
+                            <span className="label-text">備註</span>
+                          </label>
+                          <textarea
+                            value={basicInfo.memo || ""}
+                            required
+                            onChange={(e) =>
+                              setBasicInfo({ ...basicInfo, memo: e.target.value })
+                            }
+                            className="textarea textarea-bordered w-full h-24"
+                            placeholder="請輸入備註..."
+                          />
+                        </div>
 
                         {/* 參加狀態 */}
                         <div className="flex gap-2 py-2">
