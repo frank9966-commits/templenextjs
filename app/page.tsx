@@ -26,8 +26,8 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="hero min-h-screen overflow-hidden flex flex-col items-center justify-center">
-      <div className="hero-overlay bg-white flex flex-col items-center justify-center pt-4 w-full">
+    <div className="hero min-h-screen flex flex-col items-center justify-center">
+      <div className="hero-overlay bg-white flex flex-col items-center justify-center w-full">
         <Image
           src="/test.png"
           alt="活動圖片"
