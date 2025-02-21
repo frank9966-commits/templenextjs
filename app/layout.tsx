@@ -1,4 +1,4 @@
-"use client"; // ✅ 確保這是 Client Component
+"use client";
 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -17,19 +17,27 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="zh-TW" className="h-full">
+      {/* 讓 html 填滿畫面高度 */}
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen`}
+        className={`
+          ${geistSans.variable} 
+          ${geistMono.variable} 
+          antialiased 
+          flex 
+          flex-col 
+          h-full 
+          overflow-hidden  /* <-- 關鍵：不需要滾動條 */
+        `}
       >
-        <SessionProvider> {/* ✅ 確保 SessionProvider 在 client component 內 */}
-          <header className="w-full p-4 bg-base-200 flex justify-center">
+        <SessionProvider>
+          <header className="w-full p-4 flex justify-center">
             <HomeButton />
           </header>
-
           <main className="flex-1 flex items-center justify-center w-full">
             {children}
           </main>

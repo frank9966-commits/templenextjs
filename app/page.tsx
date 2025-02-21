@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react"; // ✅ 加入 useSession()
 import { supabase } from "@/lib/supabaseClient";
+import Image from "next/image";
 
 export default function Home() {
   const [title, setTitle] = useState("");
@@ -26,8 +27,17 @@ export default function Home() {
 
   return (
     <div className="hero min-h-screen">
-      <div className="hero-overlay bg-black bg-opacity-60"></div>
-      <div className="hero-content flex-col w-full max-w-2xl text-center text-neutral-content">
+      <div className="hero-overlay bg-white flex justify-center items-start pt-10">
+        <Image
+          src="/test.png"
+          alt="活動圖片"
+          width={640}
+          height={320}
+          className="max-w-[320px] w-full h-auto rounded-lg"
+        />
+
+      </div>
+      <div className="hero-content flex-col w-full max-w-2xl text-center text-neutral-content mt-20">
         <div className="card bg-base-100 text-black w-full shadow-xl">
           <div className="card-body">
             <h1 className="text-3xl sm:text-4xl font-bold">

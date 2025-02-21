@@ -26,7 +26,7 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-base-200 px-4">
+    <div className="min-h-screen flex items-center justify-center px-4">
       <div className="card w-full max-w-sm bg-base-100 shadow-xl">
         <div className="card-body px-6 py-8">
           <h2 className="text-2xl font-bold text-center">管理員登入</h2>
