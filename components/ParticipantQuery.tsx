@@ -360,7 +360,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                 </div>
 
                 {/* 新增參加狀態選擇 */}
-                <div className="flex gap-2 mt-2">
+                <div className="flex mr-4 gap-2">
                   <button
                     type="button"
                     onClick={() =>
@@ -537,7 +537,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                         </div>
 
                         {/* 參加狀態 */}
-                        <div className="flex gap-2 py-2">
+                        <div className="flex mr-4 gap-2">
                           <button
                             type="button"
                             onClick={() =>

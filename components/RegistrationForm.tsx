@@ -241,7 +241,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
         </div>
 
         {/* 三個狀態按鈕 */}
-        <div className="flex gap-2">
+        <div className="flex mr-4 gap-2">
           <button
             type="button"
             onClick={() => setParticipationStatus("join")}
