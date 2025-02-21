@@ -34,7 +34,7 @@ export default function RootLayout({
         `}
       >
         <SessionProvider>
-          <header className="w-auto bg-base-100 pt-2 flex justify-center">
+          <header className="w-auto bg-base-200 pt-2 flex justify-center">
             <HomeButton />
           </header>
           <main className="flex-1 flex items-center justify-center w-auto">
