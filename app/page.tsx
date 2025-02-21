@@ -26,14 +26,14 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="hero min-h-screen flex flex-col items-center justify-center">
-      <div className="hero-overlay bg-white flex flex-col items-center justify-center w-full">
+    <div className="hero min-h-screen flex flex-col items-center justify-center bg-base-200">
+      <div className="flex flex-col items-center justify-center w-full">
         <Image
           src="/test.png"
           alt="活動圖片"
-          width={480}
+          width={300}
           height={300}
-          className="max-w-[300px] w-full h-auto rounded-lg"
+          className="max-w-[300px] h-auto"
         />
       </div>
       <div className="hero-content flex-col w-full max-w-2xl text-center text-black">
