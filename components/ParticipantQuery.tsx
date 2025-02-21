@@ -355,7 +355,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                       setBasicInfo({ ...basicInfo, memo: e.target.value })
                     }
                     className="textarea textarea-bordered w-full h-24"
-                    placeholder="請輸入備註..."
+                    placeholder="範例：神尊指示注意事項"
                   />
                 </div>
 
@@ -526,15 +526,16 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             <span className="label-text">備註</span>
                           </label>
                           <textarea
-                            value={basicInfo.memo || ""}
+                            value={member.memo || ""}
                             required
                             onChange={(e) =>
-                              setBasicInfo({ ...basicInfo, memo: e.target.value })
+                              handleFamilyMemberChange(index, "memo", e.target.value)
                             }
                             className="textarea textarea-bordered w-full h-24"
-                            placeholder="請輸入備註..."
+                            placeholder="範例：神尊指示注意事項"
                           />
                         </div>
+
 
                         {/* 參加狀態 */}
                         <div className="flex mr-4 gap-2">
