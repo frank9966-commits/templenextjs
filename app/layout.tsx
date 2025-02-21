@@ -31,7 +31,6 @@ export default function RootLayout({
           flex 
           flex-col 
           h-auto 
-          overflow-hidden  /* <-- 關鍵：不需要滾動條 */
         `}
       >
         <SessionProvider>
