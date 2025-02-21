@@ -26,8 +26,8 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="hero min-h-screen">
-      <div className="hero-overlay bg-white flex justify-center items-start pt-10">
+    <div className="hero min-h-screen overflow-hidden flex flex-col items-center justify-center">
+      <div className="hero-overlay bg-white flex flex-col items-center justify-center pt-4 w-full">
         <Image
           src="/test.png"
           alt="活動圖片"
@@ -35,10 +35,9 @@ export default function Home() {
           height={320}
           className="max-w-[320px] w-full h-auto rounded-lg"
         />
-
       </div>
-      <div className="hero-content flex-col w-full max-w-2xl text-center text-neutral-content mt-20">
-        <div className="card bg-base-100 text-black w-full shadow-xl">
+      <div className="hero-content flex-col w-full max-w-2xl text-center text-black">
+        <div className="card bg-base-100 w-full shadow-xl">
           <div className="card-body">
             <h1 className="text-3xl sm:text-4xl font-bold">
               {title || "活動標題"}
@@ -47,7 +46,6 @@ export default function Home() {
               <a href="/register" className="btn btn-primary w-full sm:w-auto">
                 報名參加
               </a>
-
               {/* ✅ 只有 `admin` 才能看到管理後台按鈕 */}
               {session?.user?.role === "admin" && (
                 <a href="/admin" className="btn btn-secondary w-full sm:w-auto">
