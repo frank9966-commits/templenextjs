@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-TW" className="h-full">
+    <html lang="zh-TW" className="h-auto">
       {/* 讓 html 填滿畫面高度 */}
       <body
         className={`
@@ -30,15 +30,15 @@ export default function RootLayout({
           antialiased 
           flex 
           flex-col 
-          h-full 
+          h-auto 
           overflow-hidden  /* <-- 關鍵：不需要滾動條 */
         `}
       >
         <SessionProvider>
-          <header className="w-full p-4 flex justify-center">
+          <header className="w-auto pt-2 flex justify-center">
             <HomeButton />
           </header>
-          <main className="flex-1 flex items-center justify-center w-full">
+          <main className="flex-1 flex items-center justify-center w-auto">
             {children}
           </main>
         </SessionProvider>
