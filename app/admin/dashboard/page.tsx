@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import ExportExcel from "@/components/ExportExcel"; // ✅ 引入 Excel 匯出元件
 
-
 interface Participant {
   id: number;
   id_card: string;
   name: string;
+  password?: string;
   participation_status?: string;
   address?: string;
   birthday?: string;
@@ -20,11 +20,15 @@ interface Participant {
   events: { title: string } | null;
   pay_status?: string;
   memo?: string;
+  role?: string; // ✅ 新增角色欄位
 }
 
 export default function AdminDashboard() {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [error, setError] = useState<string>("");
+  const [selectedUser, setSelectedUser] = useState<Participant | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [message, setMessage] = useState("");
 
   // 取得參與者資料
   useEffect(() => {
@@ -62,7 +66,7 @@ export default function AdminDashboard() {
   const markAsViewed = async (id: number) => {
     const { error } = await supabase
       .from("participants")
-      .update({ admin_viewed: true }) // ✅ 更新 admin_viewed
+      .update({ admin_viewed: true })
       .eq("id", id);
 
     if (!error) {
@@ -71,6 +75,45 @@ export default function AdminDashboard() {
       );
     } else {
       console.error("標記為已查看失敗：", error);
+    }
+  };
+
+  // ✅ 新增：更新角色為管理員
+  const updateRole = async (id: number, newRole: string) => {
+    const { error } = await supabase
+      .from("participants")
+      .update({ role: newRole })
+      .eq("id", id);
+
+    if (!error) {
+      setParticipants((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, role: newRole } : p))
+      );
+    } else {
+      console.error("更新角色失敗：", error);
+    }
+  };
+
+  // ✅ 修改密碼函式
+  const handleChangePassword = async () => {
+    if (!selectedUser) return;
+    setMessage("");
+
+    // ✅ 更新密碼
+    const { error } = await supabase
+      .from("participants")
+      .update({ password: newPassword })
+      .eq("id_card", selectedUser.id_card);
+
+    if (error) {
+      setMessage("密碼更新失敗：" + error.message);
+    } else {
+      setMessage("密碼更新成功！");
+
+      setSelectedUser(null);
+      setNewPassword("");
+      setMessage("");
+      ;
     }
   };
 
@@ -83,7 +126,6 @@ export default function AdminDashboard() {
         .eq("id", id);
 
       if (!error) {
-        // 從狀態中移除被刪除的參與者
         setParticipants((prev) => prev.filter((p) => p.id !== id));
       } else {
         console.error("刪除參與者失敗：", error);
@@ -91,35 +133,41 @@ export default function AdminDashboard() {
     }
   };
 
+  // 表頭陣列，新增「角色」欄位
+  const headers = [
+    "姓名",
+    "活動名稱",
+    "身分證",
+    "地址",
+    "生辰",
+    "生肖",
+    "是否參加",
+    "參加梯次",
+    "關係人",
+    "備註",
+    "創造日期",
+    "最後編輯",
+    "繳費狀態",
+    "角色",
+    "修改密碼",
+    "管理",
+  ];
 
   return (
-    <div className="w-full mx-auto p-4">
+    // 改成 w-full，讓容器寬度隨視窗
+    <div className="w-full mx-auto p-4 bg-base-200 ">
       {error && <p className="text-red-500 text-center">{error}</p>}
       <div className="text-right mb-4">
         <ExportExcel data={participants} filename="報名資料.xlsx" />
       </div>
 
-      {/* 表格呈現資料 */}
-      <div className="overflow-auto max-h-[700px]">
-        <table className="table-auto w-full border-collapse border border-gray-300">
+      {/* 表格呈現資料，僅水平溢位滾動 */}
+      <div className="overflow-x-auto max-h-[700px]">
+        {/* 設定 min-w 使表格寬度超出容器，觸發水平捲軸 */}
+        <table className="min-w-[150vw] table-auto border-collapse border border-gray-300">
           <thead className="bg-gray-200 sticky top-0 z-20">
             <tr className="text-left">
-              {[
-                "姓名",
-                "活動名稱",
-                "身分證",
-                "地址",
-                "生辰",
-                "生肖",
-                "是否參加",
-                "參加梯次",
-                "關係人",
-                "備註",
-                "創造日期",
-                "最後編輯",
-                "繳費狀態",
-                "管理",
-              ].map((header) => (
+              {headers.map((header) => (
                 <th key={header} className="border border-gray-300 p-2">
                   {header}
                 </th>
@@ -169,7 +217,7 @@ export default function AdminDashboard() {
                   <td className="border border-gray-300 p-2">
                     <select
                       className="border p-1 rounded"
-                      value={p.pay_status || "未繳交"} // 預設值
+                      value={p.pay_status || "未繳交"}
                       onChange={(e) => updatePayStatus(p.id, e.target.value)}
                     >
                       <option value="已繳交">已繳交</option>
@@ -177,11 +225,33 @@ export default function AdminDashboard() {
                     </select>
                   </td>
 
+                  {/* ✅ 角色欄位：若非管理員則提供設為管理員按鈕 */}
+                  <td className="border border-gray-300 p-2">
+                    {p.role === "admin" ? (
+                      <span className="text-blue-600 font-bold">管理員</span>
+                    ) : (
+                      <button
+                        onClick={() => updateRole(p.id, "admin")}
+                        className="btn btn-sm btn-info"
+                      >
+                        設為管理員
+                      </button>
+                    )}
+                  </td>
+                  {/* 修改密碼按鈕 */}
+                  <td className="border border-gray-300 p-2">
+                    <button
+                      className="btn btn-sm btn-warning"
+                      onClick={() => setSelectedUser(p)}
+                    >
+                      修改密碼
+                    </button>
+                  </td>
                   {/* ✅ 修正「標記已查看」按鈕邏輯 */}
                   <td className="border border-gray-300 p-2">
                     {!p.admin_viewed && hasChanges && (
                       <button
-                        onClick={() => markAsViewed(p.id)} // ✅ 改成正確的函式
+                        onClick={() => markAsViewed(p.id)}
                         className="btn btn-warning w-full text-sm px-2 py-1"
                       >
                         標記已查看
@@ -200,6 +270,42 @@ export default function AdminDashboard() {
                 </tr>
               );
             })}
+            {/* ✅ 修改密碼 Modal */}
+            {selectedUser && (
+              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                  <h2 className="text-xl font-bold text-center mb-4">修改密碼 - {selectedUser.name}</h2>
+
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">新密碼</span>
+                    </label>
+                    <input
+                      type="password"
+                      className="input input-bordered w-full"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="輸入新密碼"
+                    />
+                  </div>
+
+                  {message && <p className="text-red-500 text-center mt-2">{message}</p>}
+
+                  <div className="p-4">
+                    <button onClick={handleChangePassword}
+                      className="btn btn-primary my-2 w-full">
+                      確認修改
+                    </button>
+                    <button
+                      onClick={() => setSelectedUser(null)}
+                      className="btn btn-secondary w-full"
+                    >
+                      取消
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </tbody>
         </table>
       </div>
