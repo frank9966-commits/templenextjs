@@ -31,9 +31,9 @@ export default function Home() {
         <Image
           src="/test.png"
           alt="活動圖片"
-          width={640}
-          height={320}
-          className="max-w-[320px] w-full h-auto rounded-lg"
+          width={480}
+          height={240}
+          className="max-w-[240px] w-full h-auto rounded-lg"
         />
       </div>
       <div className="hero-content flex-col w-full max-w-2xl text-center text-black">
