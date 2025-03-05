@@ -51,12 +51,8 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
   const handleCheckId = async () => {
     if (!idCard) return;
     setError("");
-
-    // 將輸入轉換為大寫，避免因使用者輸入小寫導致驗證失敗
     const normalizedId = idCard.toUpperCase();
 
-
-    // 以 normalizedId 查詢資料庫
     const { data, error } = await supabase
       .from("participants")
       .select("*")
@@ -68,28 +64,31 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       setBasicInfo(null);
       setFamilyMembers([]);
     } else {
+      // 將查詢到的資料設為 basicInfo
       setBasicInfo({
         name: data.name,
         address: data.address,
         birthday: data.birthday,
-        family_id: data.family_id,
+        family_id: data.family_id || normalizedId, // 如果沒有 family_id，設為自己的 id_card
         event_date: data.event_date,
         participation_status: data.participation_status,
         zodiac_sign: data.zodiac_sign,
         memo: data.memo,
       });
-      setError("");
 
-      if (data.family_id) {
+      // 查詢家族成員
+      if (data.family_id || normalizedId) {
+        const familyIdToQuery = data.family_id || normalizedId; // 使用現有的 family_id 或自己的 id_card
         const { data: familyData, error: familyError } = await supabase
           .from("participants")
           .select("*")
-          .eq("family_id", data.family_id);
+          .eq("family_id", familyIdToQuery);
         if (familyError) {
-          setError("無法取得代表人身分證字號資料：" + familyError.message);
+          setError("無法取得家族成員資料：" + familyError.message);
           setFamilyMembers([]);
         } else {
-          setFamilyMembers(familyData);
+          // 顯示所有家族成員（排除自己）
+          setFamilyMembers(familyData.filter((m) => m.id_card !== normalizedId));
         }
       } else {
         setFamilyMembers([]);
@@ -129,7 +128,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       name: member.name || "未填寫",
       address: member.address || "未填寫",
       birthday: member.birthday || "未填寫",
-      family_id: member.family_id || "未填寫",
+      family_id: basicInfo?.family_id || member.family_id || idCard.toUpperCase(), // 優先使用 basicInfo 的 family_id
       event_date: member.event_date || "未填寫",
       participation_status: member.participation_status || "none",
       zodiac_sign: member.zodiac_sign || "未填寫",
@@ -175,7 +174,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       name: basicInfo.name || "未填寫",
       address: basicInfo.address || "未填寫",
       birthday: basicInfo.birthday || "未填寫",
-      family_id: basicInfo.family_id || "未填寫",
+      family_id: basicInfo.family_id || idCard.toUpperCase(), // 確保 family_id 有值
       event_date: basicInfo.event_date || "event_date",
       participation_status: basicInfo.participation_status || "none",
       zodiac_sign: basicInfo.zodiac_sign || "未填寫",
@@ -397,188 +396,181 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
             )}
 
             {/* 顯示家族成員編輯區塊 */}
-            {familyMembers.length > 0 && (
-              <div className="space-y-4">
-                <h2 className="text-lg font-bold">代表人身分證字號</h2>
-                <ul className="space-y-4">
-                  {familyMembers.map((member, index) => (
-                    <li key={member.id_card} className="p-2 rounded shadow">
-                      <div className="flex flex-col space-y-2">
-                        <div className="form-control">
-                          <label className="label">
-                            <span className="label-text">姓名</span>
-                          </label>
-                          <input
-                            type="text"
-                            className="input input-bordered"
-                            value={member.name || ""}
-                            required
-                            onChange={(e) =>
-                              handleFamilyMemberChange(index, "name", e.target.value)
-                            }
-                          />
-                        </div>
-                        {/* 地址 */}
-                        <div className="form-control">
-                          <label className="label">
-                            <span className="label-text">地址</span>
-                          </label>
-                          <input
-                            type="text"
-                            className="input input-bordered"
-                            value={member.address || ""}
-                            required
-                            onChange={(e) =>
-                              handleFamilyMemberChange(index, "address", e.target.value)
-                            }
-                          />
-                        </div>
-                        {/* 生辰 */}
-                        <div className="form-control">
-                          <label className="label">
-                            <span className="label-text">農曆生辰</span>
-                          </label>
-                          <input
-                            type="text"
-                            className="input input-bordered"
-                            value={member.birthday || ""}
-                            required
-                            onChange={(e) =>
-                              handleFamilyMemberChange(index, "birthday", e.target.value)
-                            }
-                          />
-                        </div>
-                        <div className="form-control">
-                          <label className="label">
-                            <span className="label-text">生肖</span>
-                          </label>
-                          <select
-                            className="select select-bordered"
-                            required
-                            value={member.zodiac_sign || ""}
-                            onChange={(e) =>
-                              handleFamilyMemberChange(index, "zodiac_sign", e.target.value)
-                            }
-                          >
-                            <option value="" disabled>請選擇生肖</option>
-                            <option value="鼠">鼠</option>
-                            <option value="牛">牛</option>
-                            <option value="虎">虎</option>
-                            <option value="兔">兔</option>
-                            <option value="龍">龍</option>
-                            <option value="蛇">蛇</option>
-                            <option value="馬">馬</option>
-                            <option value="羊">羊</option>
-                            <option value="猴">猴</option>
-                            <option value="雞">雞</option>
-                            <option value="狗">狗</option>
-                            <option value="豬">豬</option>
-                          </select>
-                        </div>
-                        <div className="form-control">
-                          <label className="label">
-                            <span className="label-text">代表人身分證字號</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={basicInfo.family_id || ""}
-                            required
-                            onChange={(e) =>
-                              setBasicInfo({ ...basicInfo, family_id: e.target.value })
-                            }
-                            className="input input-bordered w-full"
-                          />
-                        </div>
-                        <div className="form-control">
-                          <label className="label">
-                            <span className="label-text">參加梯次</span>
-                          </label>
-                          <select
-                            value={basicInfo.event_date || ""}
-                            required
-                            onChange={(e) =>
-                              setBasicInfo({ ...basicInfo, event_date: e.target.value })
-                            }
-                            className="select select-bordered w-full"
-                          >
-                            <option value="" disabled>請選擇梯次</option>
-                            <option value="第一梯次">第一梯次</option>
-                            <option value="第二梯次">第二梯次</option>
-                            <option value="第三梯次">第三梯次</option>
-                            <option value="第四梯次">第四梯次</option>
-                            <option value="第五梯次">第五梯次</option>
-                          </select>
-                        </div>
-                        <div className="form-control">
-                          <label className="label">
-                            <span className="label-text">備註</span>
-                          </label>
-                          <textarea
-                            value={member.memo || ""}
-                            required
-                            onChange={(e) =>
-                              handleFamilyMemberChange(index, "memo", e.target.value)
-                            }
-                            className="textarea textarea-bordered w-full h-24"
-                            placeholder="範例：神尊指示注意事項"
-                          />
-                        </div>
-
-
-                        {/* 參加狀態 */}
-                        <div className="flex mr-4 gap-2">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleFamilyMemberChange(index, "participation_status", "join")
-                            }
-                            className={`btn w-1/3 ${member.participation_status === "join"
-                              ? "btn-success"
-                              : "btn-outline"
-                              }`}
-                          >
-                            參加
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleFamilyMemberChange(index, "participation_status", "none")
-                            }
-                            className={`btn w-1/3 ${member.participation_status === "none"
-                              ? "btn-error"
-                              : "btn-outline"
-                              }`}
-                          >
-                            不參加
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleFamilyMemberChange(index, "participation_status", "agent")
-                            }
-                            className={`btn w-1/3 ${member.participation_status === "agent"
-                              ? "btn-warning"
-                              : "btn-outline"
-                              }`}
-                          >
-                            代辦
-                          </button>
-                        </div>
+            {familyMembers.length > 0 ? (
+              <ul className="space-y-4">
+                {familyMembers.map((member, index) => (
+                  <li key={member.id_card} className="p-2 rounded shadow">
+                    <div className="flex flex-col space-y-2">
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text">姓名</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="input input-bordered"
+                          value={member.name || ""}
+                          required
+                          onChange={(e) =>
+                            handleFamilyMemberChange(index, "name", e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text">地址</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="input input-bordered"
+                          value={member.address || ""}
+                          required
+                          onChange={(e) =>
+                            handleFamilyMemberChange(index, "address", e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text">農曆生辰</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="input input-bordered"
+                          value={member.birthday || ""}
+                          required
+                          onChange={(e) =>
+                            handleFamilyMemberChange(index, "birthday", e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text">生肖</span>
+                        </label>
+                        <select
+                          className="select select-bordered"
+                          required
+                          value={member.zodiac_sign || ""}
+                          onChange={(e) =>
+                            handleFamilyMemberChange(index, "zodiac_sign", e.target.value)
+                          }
+                        >
+                          <option value="" disabled>請選擇生肖</option>
+                          <option value="鼠">鼠</option>
+                          <option value="牛">牛</option>
+                          <option value="虎">虎</option>
+                          <option value="兔">兔</option>
+                          <option value="龍">龍</option>
+                          <option value="蛇">蛇</option>
+                          <option value="馬">馬</option>
+                          <option value="羊">羊</option>
+                          <option value="猴">猴</option>
+                          <option value="雞">雞</option>
+                          <option value="狗">狗</option>
+                          <option value="豬">豬</option>
+                        </select>
+                      </div>
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text">代表人身分證字號</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={basicInfo.family_id || ""}
+                          required
+                          onChange={(e) =>
+                            setBasicInfo({ ...basicInfo, family_id: e.target.value })
+                          }
+                          className="input input-bordered w-full"
+                        />
+                      </div>
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text">參加梯次</span>
+                        </label>
+                        <select
+                          value={basicInfo.event_date || ""}
+                          required
+                          onChange={(e) =>
+                            setBasicInfo({ ...basicInfo, event_date: e.target.value })
+                          }
+                          className="select select-bordered w-full"
+                        >
+                          <option value="" disabled>請選擇梯次</option>
+                          <option value="第一梯次">第一梯次</option>
+                          <option value="第二梯次">第二梯次</option>
+                          <option value="第三梯次">第三梯次</option>
+                          <option value="第四梯次">第四梯次</option>
+                          <option value="第五梯次">第五梯次</option>
+                        </select>
+                      </div>
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text">備註</span>
+                        </label>
+                        <textarea
+                          value={member.memo || ""}
+                          required
+                          onChange={(e) =>
+                            handleFamilyMemberChange(index, "memo", e.target.value)
+                          }
+                          className="textarea textarea-bordered w-full h-24"
+                          placeholder="範例：神尊指示注意事項"
+                        />
+                      </div>
+                      <div className="flex mr-4 gap-2">
                         <button
                           type="button"
-                          onClick={() => handleUpdateMember(member)}
-                          className="btn btn-primary w-full"
+                          onClick={() =>
+                            handleFamilyMemberChange(index, "participation_status", "join")
+                          }
+                          className={`btn w-1/3 ${member.participation_status === "join"
+                              ? "btn-success"
+                              : "btn-outline"
+                            }`}
                         >
-                          提交
+                          參加
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleFamilyMemberChange(index, "participation_status", "none")
+                          }
+                          className={`btn w-1/3 ${member.participation_status === "none"
+                              ? "btn-error"
+                              : "btn-outline"
+                            }`}
+                        >
+                          不參加
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleFamilyMemberChange(index, "participation_status", "agent")
+                          }
+                          className={`btn w-1/3 ${member.participation_status === "agent"
+                              ? "btn-warning"
+                              : "btn-outline"
+                            }`}
+                        >
+                          代辦
                         </button>
                       </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateMember(member)}
+                        className="btn btn-primary w-full"
+                      >
+                        提交
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-center">目前無其他家族成員</p>
             )}
           </div>
-          // </div>
         )}
       </div>
     </div>

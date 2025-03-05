@@ -52,12 +52,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       birthday,
       event_id: currentEvent.id,
       zodiac_sign: zodiacSign,
-      family_id: familyId,
+      family_id: familyId || idCard.toUpperCase(), // 如果 familyId 為空，設為自己的 id_card
       memo: memo,
-      participation_status: participationStatus, // 直接用字串
+      participation_status: participationStatus,
       event_date: eventDate,
     };
-    console.log(participantData)
+    console.log(participantData);
 
     // 檢查是否已存在該 id
     const { data: existed, error: fetchError } = await supabase
@@ -75,7 +75,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       if (insertError) {
         setError("報名失敗：" + insertError.message);
       } else {
-        // 依狀態彈出提示
         if (participationStatus === "join") {
           alert(
             `名子: ${basicInfo.name} 註冊與報名成功！\n\n報名成功，記得繳交費用。\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
@@ -83,13 +82,11 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
         } else if (participationStatus === "agent") {
           alert(`名子: ${basicInfo.name} 註冊與代辦成功！後續相關事宜請和管理員聯繫。`);
         } else {
-          // "none"
           alert(`名子: ${basicInfo.name} 註冊成功但選擇不參加。`);
         }
         window.location.reload();
       }
     } else {
-      // 若資料已存在
       alert("此身分證已註冊過");
       router.push("/");
     }
