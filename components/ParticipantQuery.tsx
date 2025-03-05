@@ -343,7 +343,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   placeholder="範例：神尊指示注意事項"
                 />
               </div>
-              <div className="flex mr-4 gap-2">
+              <div className="flex mr-4 gap-2 mt-2">
                 <button
                   type="button"
                   onClick={() =>
@@ -511,7 +511,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             placeholder="範例：神尊指示注意事項"
                           />
                         </div>
-                        <div className="flex mr-4 gap-2">
+                        <div className="flex mr-4 gap-2 mt-2">
                           <button
                             type="button"
                             onClick={() =>
