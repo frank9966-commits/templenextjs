@@ -8,7 +8,7 @@ interface Participant {
   id_card: string;
   name: string;
   password?: string;
-  participation_status?: string;
+  participation_status?: "join" | "none" | "agent"; // 更新為三種狀態
   agency_name?: string;
   address?: string;
   birthday?: string;
@@ -201,6 +201,8 @@ export default function AdminDashboard() {
                   <td className="border border-gray-300 p-2">
                     {p.participation_status === "join" ? (
                       <span className="text-green-600 font-semibold">參加</span>
+                    ) : p.participation_status === "agent" ? (
+                      <span className="text-orange-600 font-semibold">代辦</span>
                     ) : (
                       <span className="text-red-600 font-semibold">不參加</span>
                     )}
