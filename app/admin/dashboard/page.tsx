@@ -9,6 +9,7 @@ interface Participant {
   name: string;
   password?: string;
   participation_status?: string;
+  agency_name?: string;
   address?: string;
   birthday?: string;
   created_at: string;
@@ -142,6 +143,7 @@ export default function AdminDashboard() {
     "生辰",
     "生肖",
     "是否參加",
+    "代辦者姓名",
     "參加梯次",
     "關係人",
     "備註",
@@ -203,6 +205,7 @@ export default function AdminDashboard() {
                       <span className="text-red-600 font-semibold">不參加</span>
                     )}
                   </td>
+                  <td className="border border-gray-300 p-2">{p.agency_name || "-"}</td>
                   <td className="border border-gray-300 p-2">{p.event_date || "-"}</td>
                   <td className="border border-gray-300 p-2">{p.family_id || "-"}</td>
                   <td className="border border-gray-300 p-2">{p.memo || "-"}</td>

@@ -20,6 +20,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
   const [memo, setMemo] = useState("");
   const [zodiacSign, setZodiacSign] = useState("");
   const [eventDate, setEventDate] = useState("");
+  const [agencyName, setAgencyName] = useState(""); // 新增代辦人名稱狀態
 
   // participationStatus可以是null，表示還沒選擇；或是 "join"/"none"/"agent"
   const [participationStatus, setParticipationStatus] = useState<ParticipationStatus | null>(null);
@@ -45,6 +46,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       return;
     }
 
+    // 當選擇「代辦」時，檢查 agencyName 是否填寫
+    if (participationStatus === "agent" && !agencyName) {
+      setError("請輸入代辦人名稱。");
+      return;
+    }
+
     const participantData = {
       id_card: idCard,
       name: basicInfo.name,
@@ -56,8 +63,8 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       memo: memo,
       participation_status: participationStatus,
       event_date: eventDate,
+      agency_name: participationStatus === "agent" ? agencyName : null, // 僅在代辦時填寫
     };
-    console.log(participantData);
 
     // 檢查是否已存在該 id
     const { data: existed, error: fetchError } = await supabase
@@ -248,6 +255,23 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
             代辦
           </button>
         </div>
+
+        {/* 當選擇「代辦」時顯示代辦者姓名名稱欄位 */}
+        {participationStatus === "agent" && (
+          <div className="form-control mt-2">
+            <label className="label">
+              <span className="label-text">代辦者姓名</span>
+            </label>
+            <input
+              type="text"
+              value={agencyName}
+              onChange={(e) => setAgencyName(e.target.value)}
+              className="input input-bordered w-full"
+              placeholder="請輸入代辦者姓名"
+              required // 當選擇代辦時，必須填寫
+            />
+          </div>
+        )}
 
         <button type="submit" className="btn btn-primary w-full">
           送出報名

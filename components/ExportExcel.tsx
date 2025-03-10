@@ -17,6 +17,7 @@ interface Participant {
   pay_status?: string;
   event_date?: string;
   memo?: string;
+  agency_name?: string;
 }
 
 interface ExportExcelProps {
@@ -39,6 +40,7 @@ export default function ExportExcel({ data, filename = "報名資料.xlsx" }: Ex
       生辰: p.birthday || "-",
       生肖: p.zodiac_sign || "-",
       是否參加: p.participation_status === "join" ? "參加" : "不參加",
+      代辦者姓名: p.agency_name || "-",
       關係人: p.family_id || "-",
       參加梯次: p.family_id || "-",
       備註: p.memo || "-",

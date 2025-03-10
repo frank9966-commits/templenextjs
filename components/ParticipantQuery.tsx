@@ -17,6 +17,7 @@ export interface Participant {
   participation_status?: "join" | "none" | "agent";
   zodiac_sign?: string;
   memo?: string;
+  agency_name?: string;
 }
 
 const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _currentEvent }) => {
@@ -34,6 +35,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     event_date?: string,
     zodiac_sign?: string;
     memo?: string;
+    agency_name?: string;
   } | null>(null);
   const [error, setError] = useState("");
   const [familyMembers, setFamilyMembers] = useState<Participant[]>([]);
@@ -74,6 +76,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
         participation_status: data.participation_status,
         zodiac_sign: data.zodiac_sign,
         memo: data.memo,
+        agency_name: data.agency_name || "",
       });
 
       // 查詢家族成員
@@ -135,6 +138,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       memo: member.memo || "未填寫",
       event_id: latestEvent.id, // ✅ 確保 `event_id` 是最新活動
       admin_viewed: false,
+      agency_name: member.agency_name || "", // 加入 agency_name
     };
 
     console.log("更新家族成員資料:", updatedData);
@@ -181,6 +185,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       memo: basicInfo.memo || "未填寫",
       event_id: latestEvent.id, // ✅ 確保 `event_id` 是最新活動
       admin_viewed: false,
+      agency_name: basicInfo.agency_name || "", // 加入 agency_name
     };
 
     console.log("更新資料:", updatedData);
@@ -201,7 +206,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     <div className="card w-full shadow-xl bg-base-100">
       <div className="card-body space-y-4">
         <p className="text-center text-lg">請輸入您的身分證以查詢基本資料：</p>
-  
+
         <div className="form-control">
           <label className="label">
             <span className="label-text">身分證</span>
@@ -214,15 +219,15 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
             className="input input-bordered w-full"
           />
         </div>
-  
+
         <button onClick={handleCheckId} className="btn btn-secondary w-full">
           查詢資料
         </button>
-  
+
         {basicInfo && (
           <div className="card shadow-lg bg-base-50 mt-4">
             {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-  
+
             {/* 始終顯示自己的基本資料 */}
             <div className="mb-4">
               <h2 className="text-lg font-bold">我的基本資料</h2>
@@ -349,9 +354,8 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   onClick={() =>
                     setBasicInfo({ ...basicInfo, participation_status: "join" })
                   }
-                  className={`btn w-1/3 ${
-                    basicInfo.participation_status === "join" ? "btn-success" : "btn-outline"
-                  }`}
+                  className={`btn w-1/3 ${basicInfo.participation_status === "join" ? "btn-success" : "btn-outline"
+                    }`}
                 >
                   參加
                 </button>
@@ -360,9 +364,8 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   onClick={() =>
                     setBasicInfo({ ...basicInfo, participation_status: "none" })
                   }
-                  className={`btn w-1/3 ${
-                    basicInfo.participation_status === "none" ? "btn-error" : "btn-outline"
-                  }`}
+                  className={`btn w-1/3 ${basicInfo.participation_status === "none" ? "btn-error" : "btn-outline"
+                    }`}
                 >
                   不參加
                 </button>
@@ -371,13 +374,31 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   onClick={() =>
                     setBasicInfo({ ...basicInfo, participation_status: "agent" })
                   }
-                  className={`btn w-1/3 ${
-                    basicInfo.participation_status === "agent" ? "btn-warning" : "btn-outline"
-                  }`}
+                  className={`btn w-1/3 ${basicInfo.participation_status === "agent" ? "btn-warning" : "btn-outline"
+                    }`}
                 >
                   代辦
                 </button>
               </div>
+
+              {/* 當選擇「代辦」時顯示代辦者姓名欄位 */}
+              {basicInfo.participation_status === "agent" && (
+                <div className="form-control mt-2">
+                  <label className="label">
+                    <span className="label-text">代辦者姓名</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={basicInfo.agency_name || ""}
+                    onChange={(e) =>
+                      setBasicInfo({ ...basicInfo, agency_name: e.target.value })
+                    }
+                    className="input input-bordered w-full"
+                    placeholder="請輸入代辦者姓名"
+                  />
+                </div>
+              )}
+
               <button
                 onClick={handleUpdateBasicInfo}
                 className="btn btn-primary w-full mt-2"
@@ -385,7 +406,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                 更新基本資料
               </button>
             </div>
-  
+
             {/* 家族成員區塊 */}
             <div className="space-y-4">
               <h2 className="text-lg font-bold">家族成員</h2>
@@ -517,9 +538,8 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             onClick={() =>
                               handleFamilyMemberChange(index, "participation_status", "join")
                             }
-                            className={`btn w-1/3 ${
-                              member.participation_status === "join" ? "btn-success" : "btn-outline"
-                            }`}
+                            className={`btn w-1/3 ${member.participation_status === "join" ? "btn-success" : "btn-outline"
+                              }`}
                           >
                             參加
                           </button>
@@ -528,9 +548,8 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             onClick={() =>
                               handleFamilyMemberChange(index, "participation_status", "none")
                             }
-                            className={`btn w-1/3 ${
-                              member.participation_status === "none" ? "btn-error" : "btn-outline"
-                            }`}
+                            className={`btn w-1/3 ${member.participation_status === "none" ? "btn-error" : "btn-outline"
+                              }`}
                           >
                             不參加
                           </button>
@@ -539,13 +558,31 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             onClick={() =>
                               handleFamilyMemberChange(index, "participation_status", "agent")
                             }
-                            className={`btn w-1/3 ${
-                              member.participation_status === "agent" ? "btn-warning" : "btn-outline"
-                            }`}
+                            className={`btn w-1/3 ${member.participation_status === "agent" ? "btn-warning" : "btn-outline"
+                              }`}
                           >
                             代辦
                           </button>
                         </div>
+
+                        {/* 當選擇「代辦」時顯示代辦者姓名欄位 */}
+                        {basicInfo.participation_status === "agent" && (
+                          <div className="form-control mt-2">
+                            <label className="label">
+                              <span className="label-text">代辦者姓名</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={basicInfo.agency_name || ""}
+                              onChange={(e) =>
+                                setBasicInfo({ ...basicInfo, agency_name: e.target.value })
+                              }
+                              className="input input-bordered w-full"
+                              placeholder="請輸入代辦者姓名"
+                            />
+                          </div>
+                        )}
+
                         <button
                           type="button"
                           onClick={() => handleUpdateMember(member)}
