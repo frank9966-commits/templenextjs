@@ -1,4 +1,3 @@
-// ParticipantQuery.tsx
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -21,7 +20,6 @@ export interface Participant {
 }
 
 const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _currentEvent }) => {
-  // 使用 no-op 參考以抑制 ESLint 警告
   void _currentEvent;
 
   const [idCard, setIdCard] = useState("");
@@ -31,8 +29,8 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     birthday?: string;
     family_id?: string;
     participation_status?: "join" | "none" | "agent";
-    event_id?: number,
-    event_date?: string,
+    event_id?: number;
+    event_date?: string;
     zodiac_sign?: string;
     memo?: string;
     agency_name?: string;
@@ -44,12 +42,11 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     if (error) {
       const timer = setTimeout(() => {
         setError("");
-      }, 5000); // 5000 毫秒 = 5 秒
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [error]);
 
-  // 查詢身分證資料
   const handleCheckId = async () => {
     if (!idCard) return;
     setError("");
@@ -66,12 +63,11 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       setBasicInfo(null);
       setFamilyMembers([]);
     } else {
-      // 將查詢到的資料設為 basicInfo
       setBasicInfo({
         name: data.name,
         address: data.address,
         birthday: data.birthday,
-        family_id: data.family_id || normalizedId, // 如果沒有 family_id，設為自己的 id_card
+        family_id: data.family_id || normalizedId,
         event_date: data.event_date,
         participation_status: data.participation_status,
         zodiac_sign: data.zodiac_sign,
@@ -79,9 +75,8 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
         agency_name: data.agency_name || "",
       });
 
-      // 查詢家族成員
       if (data.family_id || normalizedId) {
-        const familyIdToQuery = data.family_id || normalizedId; // 使用現有的 family_id 或自己的 id_card
+        const familyIdToQuery = data.family_id || normalizedId;
         const { data: familyData, error: familyError } = await supabase
           .from("participants")
           .select("*")
@@ -90,7 +85,6 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
           setError("無法取得家族成員資料：" + familyError.message);
           setFamilyMembers([]);
         } else {
-          // 顯示所有家族成員（排除自己）
           setFamilyMembers(familyData.filter((m) => m.id_card !== normalizedId));
         }
       } else {
@@ -99,7 +93,6 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     }
   };
 
-  // 編輯家族成員資料
   const handleFamilyMemberChange = (
     index: number,
     field: string,
@@ -112,9 +105,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     });
   };
 
-  // 更新單筆家族成員資料到資料庫
   const handleUpdateMember = async (member: Participant) => {
-    // ✅ 先查詢最新活動 ID
     const { data: latestEvent, error: eventError } = await supabase
       .from("events")
       .select("id")
@@ -131,14 +122,14 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       name: member.name || "未填寫",
       address: member.address || "未填寫",
       birthday: member.birthday || "未填寫",
-      family_id: basicInfo?.family_id || member.family_id || idCard.toUpperCase(), // 優先使用 basicInfo 的 family_id
+      family_id: member.family_id || idCard.toUpperCase(),
       event_date: member.event_date || "未填寫",
       participation_status: member.participation_status || "none",
       zodiac_sign: member.zodiac_sign || "未填寫",
       memo: member.memo || "未填寫",
-      event_id: latestEvent.id, // ✅ 確保 `event_id` 是最新活動
+      event_id: latestEvent.id,
       admin_viewed: false,
-      agency_name: member.agency_name || "", // 加入 agency_name
+      agency_name: member.agency_name || "",
     };
 
     console.log("更新家族成員資料:", updatedData);
@@ -146,22 +137,20 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     const { error } = await supabase
       .from("participants")
       .update(updatedData)
-      .eq("id_card", member.id_card)
+      .eq("id_card", member.id_card);
 
     if (error) {
       alert("更新失敗：" + error.message);
     } else {
-      alert(`基本資料更新成功！ \n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`);
+      alert(
+        `基本資料更新成功！ \n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
+      );
     }
   };
 
-
-
-  // 更新基本資料（沒有家族成員時使用）
   const handleUpdateBasicInfo = async () => {
     if (!basicInfo) return;
 
-    // ✅ 先查詢最新活動 ID
     const { data: latestEvent, error: eventError } = await supabase
       .from("events")
       .select("id")
@@ -178,14 +167,14 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       name: basicInfo.name || "未填寫",
       address: basicInfo.address || "未填寫",
       birthday: basicInfo.birthday || "未填寫",
-      family_id: basicInfo.family_id || idCard.toUpperCase(), // 確保 family_id 有值
+      family_id: basicInfo.family_id || idCard.toUpperCase(),
       event_date: basicInfo.event_date || "event_date",
       participation_status: basicInfo.participation_status || "none",
       zodiac_sign: basicInfo.zodiac_sign || "未填寫",
       memo: basicInfo.memo || "未填寫",
-      event_id: latestEvent.id, // ✅ 確保 `event_id` 是最新活動
+      event_id: latestEvent.id,
       admin_viewed: false,
-      agency_name: basicInfo.agency_name || "", // 加入 agency_name
+      agency_name: basicInfo.agency_name || "",
     };
 
     console.log("更新資料:", updatedData);
@@ -193,12 +182,14 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     const { error } = await supabase
       .from("participants")
       .update(updatedData)
-      .eq("id_card", idCard)
+      .eq("id_card", idCard);
 
     if (error) {
       alert("更新基本資料失敗：" + error.message);
     } else {
-      alert(`基本資料更新成功！\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`);
+      alert(
+        `基本資料更新成功！\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
+      );
     }
   };
 
@@ -228,7 +219,6 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
           <div className="card shadow-lg bg-base-50 mt-4">
             {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
-            {/* 始終顯示自己的基本資料 */}
             <div className="mb-4">
               <h2 className="text-lg font-bold">我的基本資料</h2>
               <div className="form-control">
@@ -354,8 +344,9 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   onClick={() =>
                     setBasicInfo({ ...basicInfo, participation_status: "join" })
                   }
-                  className={`btn w-1/3 ${basicInfo.participation_status === "join" ? "btn-success" : "btn-outline"
-                    }`}
+                  className={`btn w-1/3 ${
+                    basicInfo.participation_status === "join" ? "btn-success" : "btn-outline"
+                  }`}
                 >
                   參加
                 </button>
@@ -364,8 +355,9 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   onClick={() =>
                     setBasicInfo({ ...basicInfo, participation_status: "none" })
                   }
-                  className={`btn w-1/3 ${basicInfo.participation_status === "none" ? "btn-error" : "btn-outline"
-                    }`}
+                  className={`btn w-1/3 ${
+                    basicInfo.participation_status === "none" ? "btn-error" : "btn-outline"
+                  }`}
                 >
                   不參加
                 </button>
@@ -374,14 +366,13 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   onClick={() =>
                     setBasicInfo({ ...basicInfo, participation_status: "agent" })
                   }
-                  className={`btn w-1/3 ${basicInfo.participation_status === "agent" ? "btn-warning" : "btn-outline"
-                    }`}
+                  className={`btn w-1/3 ${
+                    basicInfo.participation_status === "agent" ? "btn-warning" : "btn-outline"
+                  }`}
                 >
                   代辦
                 </button>
               </div>
-
-              {/* 當選擇「代辦」時顯示代辦者姓名欄位 */}
               {basicInfo.participation_status === "agent" && (
                 <div className="form-control mt-2">
                   <label className="label">
@@ -398,7 +389,6 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   />
                 </div>
               )}
-
               <button
                 onClick={handleUpdateBasicInfo}
                 className="btn btn-primary w-full mt-2"
@@ -407,7 +397,6 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
               </button>
             </div>
 
-            {/* 家族成員區塊 */}
             <div className="space-y-4">
               <h2 className="text-lg font-bold">家族成員</h2>
               {familyMembers.length > 0 ? (
@@ -490,10 +479,10 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                           </label>
                           <input
                             type="text"
-                            value={basicInfo.family_id || ""}
+                            value={member.family_id || ""}
                             required
                             onChange={(e) =>
-                              setBasicInfo({ ...basicInfo, family_id: e.target.value })
+                              handleFamilyMemberChange(index, "family_id", e.target.value)
                             }
                             className="input input-bordered w-full"
                           />
@@ -503,10 +492,10 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             <span className="label-text">參加梯次</span>
                           </label>
                           <select
-                            value={basicInfo.event_date || ""}
+                            value={member.event_date || ""}
                             required
                             onChange={(e) =>
-                              setBasicInfo({ ...basicInfo, event_date: e.target.value })
+                              handleFamilyMemberChange(index, "event_date", e.target.value)
                             }
                             className="select select-bordered w-full"
                           >
@@ -538,8 +527,11 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             onClick={() =>
                               handleFamilyMemberChange(index, "participation_status", "join")
                             }
-                            className={`btn w-1/3 ${member.participation_status === "join" ? "btn-success" : "btn-outline"
-                              }`}
+                            className={`btn w-1/3 ${
+                              member.participation_status === "join"
+                                ? "btn-success"
+                                : "btn-outline"
+                            }`}
                           >
                             參加
                           </button>
@@ -548,8 +540,11 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             onClick={() =>
                               handleFamilyMemberChange(index, "participation_status", "none")
                             }
-                            className={`btn w-1/3 ${member.participation_status === "none" ? "btn-error" : "btn-outline"
-                              }`}
+                            className={`btn w-1/3 ${
+                              member.participation_status === "none"
+                                ? "btn-error"
+                                : "btn-outline"
+                            }`}
                           >
                             不參加
                           </button>
@@ -558,31 +553,31 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             onClick={() =>
                               handleFamilyMemberChange(index, "participation_status", "agent")
                             }
-                            className={`btn w-1/3 ${member.participation_status === "agent" ? "btn-warning" : "btn-outline"
-                              }`}
+                            className={`btn w-1/3 ${
+                              member.participation_status === "agent"
+                                ? "btn-warning"
+                                : "btn-outline"
+                            }`}
                           >
                             代辦
                           </button>
                         </div>
-
-                        {/* 當選擇「代辦」時顯示代辦者姓名欄位 */}
-                        {basicInfo.participation_status === "agent" && (
+                        {member.participation_status === "agent" && (
                           <div className="form-control mt-2">
                             <label className="label">
                               <span className="label-text">代辦者姓名</span>
                             </label>
                             <input
                               type="text"
-                              value={basicInfo.agency_name || ""}
+                              value={member.agency_name || ""}
                               onChange={(e) =>
-                                setBasicInfo({ ...basicInfo, agency_name: e.target.value })
+                                handleFamilyMemberChange(index, "agency_name", e.target.value)
                               }
                               className="input input-bordered w-full"
                               placeholder="請輸入代辦者姓名"
                             />
                           </div>
                         )}
-
                         <button
                           type="button"
                           onClick={() => handleUpdateMember(member)}
