@@ -275,6 +275,7 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
       alert("請輸入正確的捐款金額");
       return;
     }
+    
     if (donationAmountNum > _currentEvent.total_amount) {
       alert("捐款金額不能超過活動總金額");
       return;

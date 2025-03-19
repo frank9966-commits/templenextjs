@@ -115,7 +115,7 @@ const DonationsForm: React.FC<DonationsFormProps> = ({ currentEvent }) => {
 
     // 檢查餘額是否足夠
     if (eventData.total_amount < donationAmountNum) {
-      setError("活動餘額不足，扣款失敗");
+      setError("捐款金額不能超過活動總金額。");
       return;
     }
 
