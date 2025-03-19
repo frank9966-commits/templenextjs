@@ -14,7 +14,6 @@ export interface Participant {
   birthday?: string;
   family_id?: string;
   event_id?: number;
-  zodiac_sign?: string;
   donations_memo?: string;
   agency_name?: string;
 }
@@ -29,7 +28,6 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
     birthday?: string;
     family_id?: string;
     event_id?: number;
-    zodiac_sign?: string;
     donations_memo?: string;
     agency_name?: string;
   } | null>(null);
@@ -75,7 +73,6 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
         address: data.address,
         birthday: data.birthday,
         family_id: data.family_id || normalizedId,
-        zodiac_sign: data.zodiac_sign,
         donations_memo: data.donations_memo,
         agency_name: data.agency_name || "",
       });
@@ -202,7 +199,6 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
   //     address: member.address || "未填寫",
   //     birthday: member.birthday || "未填寫",
   //     family_id: member.family_id || idCard.toUpperCase(),
-  //     zodiac_sign: member.zodiac_sign || "未填寫",
   //     donations_memo: member.donations_memo || "未填寫",
   //     event_id: latestEvent.id,
   //     admin_viewed: false,
@@ -245,7 +241,6 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
   //     address: basicInfo.address || "未填寫",
   //     birthday: basicInfo.birthday || "未填寫",
   //     family_id: basicInfo.family_id || idCard.toUpperCase(),
-  //     zodiac_sign: basicInfo.zodiac_sign || "未填寫",
   //     donations_memo: basicInfo.donations_memo || "未填寫",
   //     event_id: latestEvent.id,
   //     admin_viewed: false,
@@ -399,32 +394,6 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
               </div>
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">生肖</span>
-                </label>
-                <select
-                  value={basicInfo?.zodiac_sign || ""}
-                  disabled
-                  className="select select-bordered w-full"
-                >
-                  <option value="" disabled>
-                    請選擇您的生肖
-                  </option>
-                  <option value="鼠">鼠</option>
-                  <option value="牛">牛</option>
-                  <option value="虎">虎</option>
-                  <option value="兔">兔</option>
-                  <option value="龍">龍</option>
-                  <option value="蛇">蛇</option>
-                  <option value="馬">馬</option>
-                  <option value="羊">羊</option>
-                  <option value="猴">猴</option>
-                  <option value="雞">雞</option>
-                  <option value="狗">狗</option>
-                  <option value="豬">豬</option>
-                </select>
-              </div>
-              <div className="form-control">
-                <label className="label">
                   <span className="label-text">代表人身分證字號</span>
                 </label>
                 <input
@@ -516,32 +485,6 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
                             value={member.birthday || ""}
                             readOnly
                           />
-                        </div>
-                        <div className="form-control">
-                          <label className="label">
-                            <span className="label-text">生肖</span>
-                          </label>
-                          <select
-                            className="select select-bordered"
-                            value={member.zodiac_sign || ""}
-                            disabled
-                          >
-                            <option value="" disabled>
-                              請選擇生肖
-                            </option>
-                            <option value="鼠">鼠</option>
-                            <option value="牛">牛</option>
-                            <option value="虎">虎</option>
-                            <option value="兔">兔</option>
-                            <option value="龍">龍</option>
-                            <option value="蛇">蛇</option>
-                            <option value="馬">馬</option>
-                            <option value="羊">羊</option>
-                            <option value="猴">猴</option>
-                            <option value="雞">雞</option>
-                            <option value="狗">狗</option>
-                            <option value="豬">豬</option>
-                          </select>
                         </div>
                         <div className="form-control">
                           <label className="label">
