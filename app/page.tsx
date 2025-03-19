@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSession } from "next-auth/react"; // ✅ 加入 useSession()
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 
 export default function Home() {
-  const [title, setTitle] = useState("");
+  // const [title, setTitle] = useState("");
   const { data: session } = useSession(); // ✅ 取得 session 狀態
 
   useEffect(() => {
@@ -19,7 +19,7 @@ export default function Home() {
       if (error) {
         console.error("取得最新活動標題失敗：", error);
       } else if (data) {
-        setTitle(data.title);
+        // setTitle(data.title);
       }
     }
     fetchTitle();
@@ -39,12 +39,15 @@ export default function Home() {
       <div className="hero-content flex-col w-full max-w-2xl text-center text-black">
         <div className="card bg-base-100 w-full shadow-xl">
           <div className="card-body">
-            <h1 className="text-3xl sm:text-4xl font-bold">
+            {/* <h1 className="text-3xl sm:text-4xl font-bold">
               {title || "活動標題"}
-            </h1>
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row justify-center">
+            </h1> */}
+            <div className="flex flex-col gap-4 sm:flex-row justify-center">
               <a href="/register" className="btn btn-primary w-full sm:w-auto">
-                報名參加
+                活動報名
+              </a>
+              <a href="/donations" className="btn btn-accent w-full sm:w-auto">
+                募款
               </a>
               {/* ✅ 只有 `admin` 才能看到管理後台按鈕 */}
               {session?.user?.role === "admin" && (

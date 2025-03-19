@@ -1,10 +1,10 @@
 import React from "react";
 
-interface RegistrationPromptProps {
+interface DonationsPromptProps {
   setHasParticipated: (value: boolean) => void;
 }
 
-const RegistrationPrompt: React.FC<RegistrationPromptProps> = ({ setHasParticipated }) => {
+const DonationsPrompt: React.FC<DonationsPromptProps> = ({ setHasParticipated }) => {
   return (
     <div className="card w-full shadow-xl bg-base-100">
       <div className="card-body">
@@ -22,4 +22,4 @@ const RegistrationPrompt: React.FC<RegistrationPromptProps> = ({ setHasParticipa
   );
 };
 
-export default RegistrationPrompt;
+export default DonationsPrompt;

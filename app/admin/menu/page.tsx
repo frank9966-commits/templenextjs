@@ -21,6 +21,12 @@ export default function AdminMenu() {
           >
             查看報名狀況
           </button>
+          <button
+            onClick={() => router.push("/admin/donations-events")}
+            className="btn btn-primary w-full"
+          >
+            新增捐款活動
+          </button>
         </div>
       </div>
     </div>
