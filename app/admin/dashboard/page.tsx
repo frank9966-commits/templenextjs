@@ -121,10 +121,11 @@ export default function AdminDashboard() {
   // 刪除參與者
   const deleteParticipant = async (id: number) => {
     if (confirm("您確定要刪除此參與者嗎？")) {
-      const { error } = await supabase
-        .from("participants")
-        .delete()
-        .eq("id", id);
+      // 先刪除 donations 表內的相關紀錄
+      await supabase.from("donations").delete().eq("participant_id", id);
+
+      // 再刪除 participants 表內的該筆記錄
+      const { error } = await supabase.from("participants").delete().eq("id", id);
 
       if (!error) {
         setParticipants((prev) => prev.filter((p) => p.id !== id));
@@ -133,6 +134,7 @@ export default function AdminDashboard() {
       }
     }
   };
+
 
   // 表頭陣列，新增「角色」欄位
   const headers = [
@@ -272,7 +274,6 @@ export default function AdminDashboard() {
                       </button>
                     )}
                   </td>
-
                 </tr>
               );
             })}
