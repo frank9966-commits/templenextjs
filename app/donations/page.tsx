@@ -58,9 +58,9 @@ export default function RegisterStep() {
           <h1 className="text-2xl sm:text-3xl font-bold">
             募款 - {currentEvent.title}
             <br />
-            捐款總額：{currentEvent.amount}
+            募款總額：{currentEvent.amount}
             <br />
-            目前捐款餘額：{currentEvent.total_amount}
+            目前募款餘額：{currentEvent.total_amount}
           </h1>
         </div>
         {hasParticipated === null ? (
