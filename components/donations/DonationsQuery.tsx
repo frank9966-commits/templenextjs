@@ -166,7 +166,6 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
     } else {
       alert("活動金額扣除成功，剩餘：" + newTotalAmount);
     }
-    window.location.reload();
   };
 
   const handleFamilyMemberChange = (
@@ -222,16 +221,16 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
 
     // 呼叫 RPC 函數，讓資料庫原子性地扣除活動金額
     const { data: rpcData, error: rpcError } = await supabase
-      .rpc("deduct_amount", { event_id: _currentEvent.id, amount: donationAmountNum });
+      .rpc("deduct_amount", {
+        event_id: _currentEvent.id,   // 必須跟函數參數 event_id 對應
+        amount: donationAmountNum     // 必須跟函數參數 amount 對應
+      });
 
     if (rpcError) {
       alert("捐款失敗");
     } else {
-      // RPC 回傳的資料中包含 new_total 欄位（扣除後的餘額）
-      alert("活動金額扣除成功，剩餘：" + rpcData.new_total);
+      alert("活動金額扣除成功，剩餘：" + rpcData.toLocaleString());
     }
-
-    window.location.reload();
   };
 
 

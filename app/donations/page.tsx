@@ -8,13 +8,13 @@ import DonationsForm from "@/components/donations/DonationsForm";
 
 export default function RegisterStep() {
   const [hasParticipated, setHasParticipated] = useState<boolean | null>(null);
-  const [currentEvent, setCurrentEvent] = useState<{ id: number; title: string; total_amount: number; amount: number } | null>(null);
+  const [currentEvent, setCurrentEvent] = useState<{ id: number; title: string; total_amount: number; allamount: number } | null>(null);
 
   useEffect(() => {
     async function fetchCurrentEvent() {
       const { data, error } = await supabase
         .from("donations_events")
-        .select("id, title, total_amount, amount")
+        .select("id, title, total_amount, allamount")
         .order("created_at", { ascending: false })  // 新增：依 created_at 排序
         .limit(1)                                      // 新增：僅取最新一筆資料
         .single();
@@ -58,7 +58,7 @@ export default function RegisterStep() {
           <h1 className="text-2xl sm:text-3xl font-bold">
             募款 - {currentEvent.title}
             <br />
-            募款總額：{currentEvent.amount}
+            募款總額：{currentEvent.allamount}
             <br />
             目前募款餘額：{currentEvent.total_amount}
           </h1>
