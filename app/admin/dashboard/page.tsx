@@ -119,20 +119,20 @@ export default function AdminDashboard() {
   };
 
   // 刪除參與者
-  const deleteParticipant = async (id: number) => {
-    if (confirm("您確定要刪除此參與者嗎？")) {
-      const { error } = await supabase
-        .from("participants")
-        .delete()
-        .eq("id", id);
+  const deleteParticipant = async (id: number, name: string) => {
+    if (confirm(`您確定要刪除參與者「${name}」嗎？`)) {
+      const { error } = await supabase.from("participants").delete().eq("id", id);
 
       if (!error) {
         setParticipants((prev) => prev.filter((p) => p.id !== id));
+        alert(`成功刪除參與者「${name}」`);
       } else {
         console.error("刪除參與者失敗：", error);
+        alert("刪除失敗：" + error.message);
       }
     }
   };
+
 
   // 表頭陣列，新增「角色」欄位
   const headers = [
@@ -193,7 +193,7 @@ export default function AdminDashboard() {
                   {/* 刪除 */}
                   <td className="border border-gray-300 p-2">
                     <button
-                      onClick={() => deleteParticipant(p.id)}
+                      onClick={() => deleteParticipant(p.id, p.name)}
                       className="btn btn-danger w-full text-sm px-2 py-1"
                     >
                       刪除
