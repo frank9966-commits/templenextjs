@@ -162,7 +162,7 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
       .update({ total_amount: newTotalAmount })
       .eq("id", _currentEvent.id);
     if (updateEventError) {
-      alert("捐款活動金額失敗");
+      alert("捐款失敗");
     } else {
       alert("活動金額扣除成功，剩餘：" + newTotalAmount);
     }
@@ -225,7 +225,7 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
       .rpc("deduct_amount", { event_id: _currentEvent.id, amount: donationAmountNum });
 
     if (rpcError) {
-      alert("捐款活動金額失敗");
+      alert("捐款失敗");
     } else {
       // RPC 回傳的資料中包含 new_total 欄位（扣除後的餘額）
       alert("活動金額扣除成功，剩餘：" + rpcData.new_total);
