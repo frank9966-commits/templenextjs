@@ -190,6 +190,15 @@ export default function AdminDashboard() {
 
               return (
                 <tr key={p.id} className={`${highlight} border border-gray-300`}>
+                  {/* 刪除 */}
+                  <td className="border border-gray-300 p-2">
+                    <button
+                      onClick={() => deleteParticipant(p.id)}
+                      className="btn btn-danger w-full text-sm px-2 py-1"
+                    >
+                      刪除
+                    </button>
+                  </td>
                   <td className="border border-gray-300 p-2 font-bold">{p.name}</td>
                   <td className="border border-gray-300 p-2">
                     {p.events ? p.events.title : "-"}
@@ -263,15 +272,7 @@ export default function AdminDashboard() {
                       </button>
                     )}
                   </td>
-                  {/* 刪除 */}
-                  <td className="border border-gray-300 p-2">
-                    <button
-                      onClick={() => deleteParticipant(p.id)}
-                      className="btn btn-danger w-full text-sm px-2 py-1"
-                    >
-                      刪除
-                    </button>
-                  </td>
+
                 </tr>
               );
             })}
