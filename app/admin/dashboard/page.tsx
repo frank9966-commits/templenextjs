@@ -169,12 +169,12 @@ export default function AdminDashboard() {
         <table className="min-w-[150vw] table-auto border-collapse border border-gray-300">
           <thead className="bg-gray-200 sticky top-0 z-20">
             <tr className="text-left">
+              <th className="border border-gray-300 p-2">刪除</th>
               {headers.map((header) => (
                 <th key={header} className="border border-gray-300 p-2">
                   {header}
                 </th>
               ))}
-              <th className="border border-gray-300 p-2">刪除</th>
             </tr>
           </thead>
           <tbody>
