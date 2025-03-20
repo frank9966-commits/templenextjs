@@ -87,12 +87,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       } else {
         if (participationStatus === "join") {
           alert(
-            `名子: ${trimmedName} 註冊與報名成功！\n\n報名成功，記得繳交費用。\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
+            `名字: ${trimmedName} 註冊與報名成功！\n\n報名成功，記得繳交費用。\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
           );
         } else if (participationStatus === "agent") {
-          alert(`名子: ${trimmedName} 註冊與代辦成功！後續相關事宜請和管理員聯繫。`);
+          alert(`名字: ${trimmedName} 註冊與代辦成功！後續相關事宜請和管理員聯繫。`);
         } else {
-          alert(`名子: ${trimmedName} 註冊成功但選擇不參加。`);
+          alert(`名字: ${trimmedName} 註冊成功但選擇不參加。`);
         }
         window.location.reload();
       }

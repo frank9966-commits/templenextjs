@@ -16,16 +16,16 @@ export default function AdminMenu() {
             新增活動標題
           </button>
           <button
+            onClick={() => router.push("/admin/donations-events")}
+            className="btn btn-accent w-full"
+          >
+            新增捐款活動
+          </button>
+          <button
             onClick={() => router.push("/admin/dashboard")}
             className="btn btn-secondary w-full"
           >
             查看報名狀況
-          </button>
-          <button
-            onClick={() => router.push("/admin/donations-events")}
-            className="btn btn-primary w-full"
-          >
-            新增捐款活動
           </button>
         </div>
       </div>
