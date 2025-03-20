@@ -7,7 +7,6 @@ interface RegistrationFormProps {
   currentEvent: { id: number; title: string };
 }
 
-// 定義三種參加狀態
 type ParticipationStatus = "join" | "none" | "agent";
 
 const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => {
@@ -20,18 +19,16 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
   const [memo, setMemo] = useState("");
   const [zodiacSign, setZodiacSign] = useState("");
   const [eventDate, setEventDate] = useState("");
-  const [agencyName, setAgencyName] = useState(""); // 新增代辦人名稱狀態
+  const [agencyName, setAgencyName] = useState("");
 
-  // participationStatus可以是null，表示還沒選擇；或是 "join"/"none"/"agent"
   const [participationStatus, setParticipationStatus] = useState<ParticipationStatus | null>(null);
-
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {
         setError("");
-      }, 5000); // 5000 毫秒 = 5 秒
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [error]);
@@ -40,41 +37,47 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
     e.preventDefault();
     setError("");
 
-    // 檢查必填欄位 (參加狀態不能是 null)
-    if (!idCard || !basicInfo?.name || !address || !birthday || !participationStatus) {
+    const trimmedIdCard = idCard.trim();
+    const trimmedName = basicInfo?.name.trim() || "";
+    const trimmedAddress = address.trim();
+    const trimmedBirthday = birthday.trim();
+    const trimmedFamilyId = familyId.trim();
+    const trimmedMemo = memo.trim();
+    const trimmedZodiacSign = zodiacSign.trim();
+    const trimmedEventDate = eventDate.trim();
+    const trimmedAgencyName = agencyName.trim();
+
+    if (!trimmedIdCard || !trimmedName || !trimmedAddress || !trimmedBirthday || !participationStatus) {
       setError("所有欄位皆為必填，請完整填寫表單。");
       return;
     }
 
-    // 當選擇「代辦」時，檢查 agencyName 是否填寫
-    if (participationStatus === "agent" && !agencyName) {
+    if (participationStatus === "agent" && !trimmedAgencyName) {
       setError("請輸入代辦人名稱。");
       return;
     }
 
     const participantData = {
-      id_card: idCard,
-      name: basicInfo.name,
-      address,
-      birthday,
+      id_card: trimmedIdCard,
+      name: trimmedName,
+      address: trimmedAddress,
+      birthday: trimmedBirthday,
       event_id: currentEvent.id,
-      zodiac_sign: zodiacSign,
-      family_id: familyId || idCard.toUpperCase(), // 如果 familyId 為空，設為自己的 id_card
-      memo: memo,
+      zodiac_sign: trimmedZodiacSign,
+      family_id: trimmedFamilyId || trimmedIdCard.toUpperCase(),
+      memo: trimmedMemo,
       participation_status: participationStatus,
-      event_date: eventDate,
-      agency_name: participationStatus === "agent" ? agencyName : null, // 僅在代辦時填寫
+      event_date: trimmedEventDate,
+      agency_name: participationStatus === "agent" ? trimmedAgencyName : null,
     };
 
-    // 檢查是否已存在該 id
     const { data: existed, error: fetchError } = await supabase
       .from("participants")
       .select("*")
-      .eq("id_card", idCard)
+      .eq("id_card", trimmedIdCard)
       .single();
 
     if (fetchError || !existed) {
-      // 若資料不存在則 Insert 新資料
       const { error: insertError } = await supabase
         .from("participants")
         .insert([participantData]);
@@ -84,12 +87,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       } else {
         if (participationStatus === "join") {
           alert(
-            `名子: ${basicInfo.name} 註冊與報名成功！\n\n報名成功，記得繳交費用。\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
+            `名子: ${trimmedName} 註冊與報名成功！\n\n報名成功，記得繳交費用。\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
           );
         } else if (participationStatus === "agent") {
-          alert(`名子: ${basicInfo.name} 註冊與代辦成功！後續相關事宜請和管理員聯繫。`);
+          alert(`名子: ${trimmedName} 註冊與代辦成功！後續相關事宜請和管理員聯繫。`);
         } else {
-          alert(`名子: ${basicInfo.name} 註冊成功但選擇不參加。`);
+          alert(`名子: ${trimmedName} 註冊成功但選擇不參加。`);
         }
         window.location.reload();
       }
@@ -153,7 +156,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
             onChange={(e) => setBirthday(e.target.value)}
             className="input input-bordered w-full"
           />
-          <p className=" text-xs mt-2">
+          <p className="text-xs mt-2">
             範例：八十四年四月二十七日 亥時。 如不知時辰，請寫吉時
           </p>
         </div>
@@ -167,7 +170,9 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
             onChange={(e) => setZodiacSign(e.target.value)}
             className="select select-bordered w-full"
           >
-            <option value="" disabled>請選擇您的生肖</option>
+            <option value="" disabled>
+              請選擇您的生肖
+            </option>
             <option value="鼠">鼠</option>
             <option value="牛">牛</option>
             <option value="虎">虎</option>
@@ -182,7 +187,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
             <option value="豬">豬</option>
           </select>
         </div>
-
 
         <div className="form-control">
           <label className="label">
@@ -206,7 +210,9 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
             onChange={(e) => setEventDate(e.target.value)}
             className="select select-bordered w-full"
           >
-            <option value="" disabled>請選擇梯次</option>
+            <option value="" disabled>
+              請選擇梯次
+            </option>
             <option value="第一梯次">第一梯次</option>
             <option value="第二梯次">第二梯次</option>
             <option value="第三梯次">第三梯次</option>
@@ -225,38 +231,38 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
             onChange={(e) => setMemo(e.target.value)}
             className="textarea textarea-bordered w-full h-24"
           />
-
         </div>
 
-        {/* 三個狀態按鈕 */}
         <div className="flex mr-4 gap-2">
           <button
             type="button"
             onClick={() => setParticipationStatus("join")}
-            className={`btn w-1/3 ${participationStatus === "join" ? "btn-success" : "btn-outline"
-              }`}
+            className={`btn w-1/3 ${
+              participationStatus === "join" ? "btn-success" : "btn-outline"
+            }`}
           >
             參加
           </button>
           <button
             type="button"
             onClick={() => setParticipationStatus("none")}
-            className={`btn w-1/3 ${participationStatus === "none" ? "btn-error" : "btn-outline"
-              }`}
+            className={`btn w-1/3 ${
+              participationStatus === "none" ? "btn-error" : "btn-outline"
+            }`}
           >
             不參加
           </button>
           <button
             type="button"
             onClick={() => setParticipationStatus("agent")}
-            className={`btn w-1/3 ${participationStatus === "agent" ? "btn-warning" : "btn-outline"
-              }`}
+            className={`btn w-1/3 ${
+              participationStatus === "agent" ? "btn-warning" : "btn-outline"
+            }`}
           >
             代辦
           </button>
         </div>
 
-        {/* 當選擇「代辦」時顯示代辦者姓名名稱欄位 */}
         {participationStatus === "agent" && (
           <div className="form-control mt-2">
             <label className="label">
@@ -268,7 +274,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
               onChange={(e) => setAgencyName(e.target.value)}
               className="input input-bordered w-full"
               placeholder="請輸入代辦者姓名"
-              required // 當選擇代辦時，必須填寫
+              required
             />
           </div>
         )}
