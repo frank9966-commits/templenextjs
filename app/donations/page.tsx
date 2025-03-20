@@ -30,10 +30,13 @@ export default function RegisterStep() {
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "donations_events" },
-        (_payload) => {
-          // 若不需要使用 payload，可以將參數命名為 _payload 避免 ESLint 警告
-          window.location.reload();
-          console.log("_payload:", _payload);
+        (payload) => {
+          if (payload.new) {
+            // payload.new 代表更新後的資料
+            setCurrentEvent((prev) =>
+              prev ? { ...prev, total_amount: payload.new.total_amount } : null
+            );
+          }
         }
       )
       .subscribe();
@@ -42,7 +45,6 @@ export default function RegisterStep() {
       channel.unsubscribe();
     };
   }, []);
-
 
 
   if (!currentEvent) {

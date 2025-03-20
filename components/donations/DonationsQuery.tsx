@@ -275,13 +275,14 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
       alert("請輸入正確的捐款金額");
       return;
     }
-    
+
+    // 先檢查餘額是否足夠（這邊可以留給 RPC 做檢查，但前端也可以先提示）
     if (donationAmountNum > _currentEvent.total_amount) {
       alert("捐款金額不能超過活動總金額");
       return;
     }
 
-    // 直接新增一筆新的捐款紀錄，每次匯款都會建立新紀錄
+    // 新增捐款紀錄（與原邏輯類似）
     const { error: insertError } = await supabase
       .from("donations")
       .insert([
@@ -293,44 +294,28 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
         },
       ])
       .single();
+
     if (insertError) {
       alert("新增捐款紀錄失敗：" + insertError.message);
+      return;
     } else {
       alert("捐款紀錄新增成功！\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊");
     }
 
-    // 新增：扣除活動金額
-    const { data: eventData, error: eventFetchError } = await supabase
-      .from("donations_events")
-      .select("*")
-      .eq("id", _currentEvent.id)
-      .single();
+    // 呼叫 RPC 函數，讓資料庫原子性地扣除活動金額
+    const { data: rpcData, error: rpcError } = await supabase
+      .rpc("deduct_amount", { event_id: _currentEvent.id, amount: donationAmountNum });
 
-    if (eventFetchError || !eventData) {
-      alert("無法取得活動資料");
-      return;
-    }
-
-    // 比對取得的活動 id 是否與 _currentEvent.id 一致
-    if (eventData.id !== _currentEvent.id) {
-      alert("活動 ID 不匹配，無法扣款");
-      return;
-    }
-
-    const newTotalAmount = eventData.total_amount - donationAmountNum;
-
-    const { error: updateEventError } = await supabase
-      .from("donations_events")
-      .update({ total_amount: newTotalAmount })
-      .eq("id", _currentEvent.id);
-
-    if (updateEventError) {
-      alert("扣除活動金額失敗：" + updateEventError.message);
+    if (rpcError) {
+      alert("扣除活動金額失敗：" + rpcError.message);
     } else {
-      alert("活動金額扣除成功，剩餘：" + newTotalAmount);
+      // RPC 回傳的資料中包含 new_total 欄位（扣除後的餘額）
+      alert("活動金額扣除成功，剩餘：" + rpcData.new_total);
     }
+
     window.location.reload();
   };
+
 
   return (
     <div className="card w-full shadow-xl bg-base-100">

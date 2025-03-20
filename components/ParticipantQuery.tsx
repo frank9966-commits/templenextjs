@@ -132,7 +132,6 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       agency_name: member.agency_name || "",
     };
 
-    console.log("更新家族成員資料:", updatedData);
 
     const { error } = await supabase
       .from("participants")
@@ -177,7 +176,6 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       agency_name: basicInfo.agency_name || "",
     };
 
-    console.log("更新資料:", updatedData);
 
     const { error } = await supabase
       .from("participants")
