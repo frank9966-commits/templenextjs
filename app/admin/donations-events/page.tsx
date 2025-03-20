@@ -24,6 +24,7 @@ export default function AddEvent() {
         title,             // 活動標題
         code: codeValue,   // 活動代碼
         total_amount: parsedAmount, // 金額
+        amount: totalAmount, // 金額
       });
 
     if (error) {
