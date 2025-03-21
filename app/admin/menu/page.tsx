@@ -25,7 +25,13 @@ export default function AdminMenu() {
             onClick={() => router.push("/admin/dashboard")}
             className="btn btn-secondary w-full"
           >
-            查看報名狀況
+            查看活動報名狀況
+          </button>
+          <button
+            onClick={() => router.push("/admin/donation")}
+            className="btn btn-error w-full"
+          >
+            查看捐款狀況
           </button>
         </div>
       </div>

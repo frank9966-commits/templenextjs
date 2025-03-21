@@ -194,7 +194,7 @@ export default function AdminDashboard() {
                   <td className="border border-gray-300 p-2">
                     <button
                       onClick={() => deleteParticipant(p.id, p.name)}
-                      className="btn btn-danger w-full text-sm px-2 py-1"
+                      className="btn btn-error w-full text-sm px-2 py-1"
                     >
                       刪除
                     </button>
@@ -255,7 +255,7 @@ export default function AdminDashboard() {
                   {/* 修改密碼按鈕 */}
                   <td className="border border-gray-300 p-2">
                     <button
-                      className="btn btn-sm btn-warning"
+                      className="btn btn-sm btn-primary"
                       onClick={() => setSelectedUser(p)}
                     >
                       修改密碼
