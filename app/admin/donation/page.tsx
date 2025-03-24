@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-// import ExportExcel from "@/components/ExportExcel";
+import ExportExcel from "../../../components/donations/ExportExcel";
 
 interface Donation {
   id: number;
@@ -15,6 +15,9 @@ interface Donation {
     birthday: string;
     address: string;
   } | null;
+  donations_events?: {
+    title: string;
+  } | null;
 }
 
 export default function DonationDashboard() {
@@ -26,7 +29,11 @@ export default function DonationDashboard() {
     async function fetchDonations() {
       const { data, error } = await supabase
         .from("donations")
-        .select("*, participants(name, id_card, birthday, address)");
+        .select(`
+          *,
+          participants(name, id_card, birthday, address),
+          donations_events(title)
+        `);
 
 
       if (error) {
@@ -58,6 +65,7 @@ export default function DonationDashboard() {
     "姓名",
     "生辰",
     "地址",
+    "活動名稱",
     "捐款金額",
     "捐款時間",
     "備註",
@@ -65,6 +73,9 @@ export default function DonationDashboard() {
 
   return (
     <div className="w-full mx-auto p-4 bg-base-200">
+      <div className="text-right mb-4">
+        <ExportExcel data={donations} filename="捐款資料.xlsx" />
+      </div>
       {error && <p className="text-red-500 text-center">{error}</p>}
 
       {/* <div className="text-right mb-4">
@@ -98,6 +109,9 @@ export default function DonationDashboard() {
                 <td className="border border-gray-300 p-2">{d.participants?.name || "-"}</td>
                 <td className="border border-gray-300 p-2">{d.participants?.birthday || "-"}</td>
                 <td className="border border-gray-300 p-2">{d.participants?.address || "-"}</td>
+                <td className="border border-gray-300 p-2">
+                  {d.donations_events?.title || "-"}
+                </td>
                 <td className="border border-gray-300 p-2">{d.donation_amount}</td>
                 <td className="border border-gray-300 p-2">
                   {new Date(d.created_at).toLocaleString()}
