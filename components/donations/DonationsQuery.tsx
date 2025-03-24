@@ -252,9 +252,13 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
           />
         </div>
 
-        <button onClick={handleCheckId} className="btn btn-secondary w-full">
+        <button
+          onClick={handleCheckId}
+          className="w-full px-6 py-3 rounded-lg text-white bg-[#C299FF] hover:opacity-90 text-lg font-bold"
+        >
           查詢資料
         </button>
+
 
         {basicInfo && (
           <div className="card shadow-lg bg-base-50 mt-4">

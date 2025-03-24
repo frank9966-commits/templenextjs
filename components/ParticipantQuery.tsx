@@ -209,9 +209,13 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
           />
         </div>
 
-        <button onClick={handleCheckId} className="btn btn-secondary w-full">
+        <button
+          onClick={handleCheckId}
+          className="w-full px-6 py-3 rounded-lg text-white bg-[#C299FF] hover:opacity-90 text-lg font-bold"
+        >
           查詢資料
         </button>
+
 
         {basicInfo && (
           <div className="card shadow-lg bg-base-50 mt-4">
@@ -342,9 +346,8 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   onClick={() =>
                     setBasicInfo({ ...basicInfo, participation_status: "join" })
                   }
-                  className={`btn w-1/3 ${
-                    basicInfo.participation_status === "join" ? "btn-success" : "btn-outline"
-                  }`}
+                  className={`btn w-1/3 ${basicInfo.participation_status === "join" ? "btn-success" : "btn-outline"
+                    }`}
                 >
                   參加
                 </button>
@@ -353,9 +356,8 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   onClick={() =>
                     setBasicInfo({ ...basicInfo, participation_status: "none" })
                   }
-                  className={`btn w-1/3 ${
-                    basicInfo.participation_status === "none" ? "btn-error" : "btn-outline"
-                  }`}
+                  className={`btn w-1/3 ${basicInfo.participation_status === "none" ? "btn-error" : "btn-outline"
+                    }`}
                 >
                   不參加
                 </button>
@@ -364,9 +366,8 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   onClick={() =>
                     setBasicInfo({ ...basicInfo, participation_status: "agent" })
                   }
-                  className={`btn w-1/3 ${
-                    basicInfo.participation_status === "agent" ? "btn-warning" : "btn-outline"
-                  }`}
+                  className={`btn w-1/3 ${basicInfo.participation_status === "agent" ? "btn-warning" : "btn-outline"
+                    }`}
                 >
                   代辦
                 </button>
@@ -525,11 +526,10 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             onClick={() =>
                               handleFamilyMemberChange(index, "participation_status", "join")
                             }
-                            className={`btn w-1/3 ${
-                              member.participation_status === "join"
+                            className={`btn w-1/3 ${member.participation_status === "join"
                                 ? "btn-success"
                                 : "btn-outline"
-                            }`}
+                              }`}
                           >
                             參加
                           </button>
@@ -538,11 +538,10 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             onClick={() =>
                               handleFamilyMemberChange(index, "participation_status", "none")
                             }
-                            className={`btn w-1/3 ${
-                              member.participation_status === "none"
+                            className={`btn w-1/3 ${member.participation_status === "none"
                                 ? "btn-error"
                                 : "btn-outline"
-                            }`}
+                              }`}
                           >
                             不參加
                           </button>
@@ -551,11 +550,10 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                             onClick={() =>
                               handleFamilyMemberChange(index, "participation_status", "agent")
                             }
-                            className={`btn w-1/3 ${
-                              member.participation_status === "agent"
+                            className={`btn w-1/3 ${member.participation_status === "agent"
                                 ? "btn-warning"
                                 : "btn-outline"
-                            }`}
+                              }`}
                           >
                             代辦
                           </button>
