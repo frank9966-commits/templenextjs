@@ -17,7 +17,7 @@ export default function AdminMenu() {
           </button>
           <button
             onClick={() => router.push("/admin/dashboard")}
-            className="w-full px-6 py-3 mb-3 rounded-lg text-white text-lg font-bold bg-[#F5E469] hover:opacity-90"
+            className="w-full px-6 py-3 mb-3 rounded-lg text-white text-lg font-bold bg-[#d3c241] hover:opacity-90"
           >
             查看活動報名狀況
           </button>
