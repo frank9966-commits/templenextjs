@@ -39,30 +39,38 @@ export default function Home() {
       <div className="hero-content flex-col w-full max-w-2xl text-center text-black">
         <div className="card bg-base-100 w-full shadow-xl">
           <div className="card-body">
-            {/* <h1 className="text-3xl sm:text-4xl font-bold">
-              {title || "活動標題"}
-            </h1> */}
-            <div className="flex flex-col gap-4 sm:flex-row justify-center">
-              <a href="/register" className="btn btn-primary w-full sm:w-auto">
+            <div className="flex flex-col gap-4 sm:flex-row justify-center text-lg font-bold">
+              <a
+                href="/register"
+                className="w-full sm:w-auto px-6 py-3 rounded-lg text-white bg-[#E6A23C] hover:opacity-90"
+              >
                 活動報名
               </a>
-              <a href="/donations" className="btn btn-accent w-full sm:w-auto">
+              <a
+                href="/donations"
+                className="w-full sm:w-auto px-6 py-3 rounded-lg text-white bg-[#409EFF] hover:opacity-90"
+              >
                 募款
               </a>
-              {/* ✅ 只有 `admin` 才能看到管理後台按鈕 */}
               {session?.user?.role === "admin" && (
-                <a href="/admin" className="btn btn-secondary w-full sm:w-auto">
+                <a
+                  href="/admin"
+                  className="w-full sm:w-auto px-6 py-3 rounded-lg text-white bg-[#67CFCF] hover:opacity-90"
+                >
                   管理後台
                 </a>
               )}
-
-              {/* 如果未登入，則顯示登入按鈕 */}
               {!session && (
-                <a href="/admin/signin" className="btn btn-secondary w-full sm:w-auto">
+                <a
+                  href="/admin/signin"
+                  className="w-full sm:w-auto px-6 py-3 rounded-lg text-white bg-[#67CFCF] hover:opacity-90"
+                >
                   管理員登入
                 </a>
               )}
             </div>
+
+
           </div>
         </div>
       </div>

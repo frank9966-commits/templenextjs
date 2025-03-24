@@ -85,7 +85,7 @@ export default function DonationDashboard() {
       <div className="overflow-x-auto max-h-[700px]">
         <table className="min-w-[1200px] table-auto border-collapse border border-gray-300">
           <thead className="bg-gray-200 sticky top-0 z-20">
-            <tr className="text-left">
+            <tr className="text-left dark:bg-gray-800 text-white">
               <th className="border border-gray-300 p-2">刪除</th>
               {headers.map((h) => (
                 <th key={h} className="border border-gray-300 p-2">
