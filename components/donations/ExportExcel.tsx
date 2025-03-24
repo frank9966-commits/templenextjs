@@ -2,8 +2,25 @@
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
+export interface Donation {
+  id: number;
+  participant_id?: number;
+  donation_amount?: number;
+  created_at: string;
+  donations_memo?: string;
+  participants: {
+    name: string;
+    id_card: string;
+    birthday: string;
+    address: string;
+  } | null;
+  donations_events?: {
+    title: string;
+  } | null;
+}
+
 interface ExportExcelProps {
-  data: any[];
+  data: Donation[];
   filename: string;
 }
 
