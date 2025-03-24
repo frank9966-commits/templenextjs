@@ -234,7 +234,7 @@ const DonationsForm: React.FC<DonationsFormProps> = ({ currentEvent }) => {
             step="1" // 限制只能輸入整數
           />
         </div>
-        <button type="submit" className="btn btn-primary w-full">
+        <button type="submit" className="w-full mt-2 px-6 py-3 rounded-lg bg-[#F57C00] text-white text-lg font-bold hover:opacity-90">
           註冊與捐款
         </button>
         {error && <p className="text-red-500 text-center">{error}</p>}

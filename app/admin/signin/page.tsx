@@ -49,7 +49,10 @@ export default function SignIn() {
             </div>
             {error && <p className="text-red-500 text-center">{error}</p>}
             <div className="form-control mt-6">
-              <button type="submit" className="btn btn-primary w-full">
+              <button
+                type="submit"
+                className="w-full px-6 py-3 rounded-lg bg-[#FF99E3] text-white text-lg font-bold hover:opacity-90"
+              >
                 登入
               </button>
             </div>

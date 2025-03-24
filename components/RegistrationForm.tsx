@@ -234,30 +234,35 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
         </div>
 
         <div className="flex mr-4 gap-2">
+          {/* 參加 */}
           <button
             type="button"
             onClick={() => setParticipationStatus("join")}
-            className={`btn w-1/3 ${
-              participationStatus === "join" ? "btn-success" : "btn-outline"
-            }`}
+            className={`w-1/3 px-4 py-2 rounded-lg text-black font-bold transition duration-200 ease-in-out
+      ${participationStatus === "join" ? "bg-[#FFA9A1]" : "border border-gray-400 bg-white"}
+    `}
           >
             參加
           </button>
+
+          {/* 不參加 */}
           <button
             type="button"
             onClick={() => setParticipationStatus("none")}
-            className={`btn w-1/3 ${
-              participationStatus === "none" ? "btn-error" : "btn-outline"
-            }`}
+            className={`w-1/3 px-4 py-2 rounded-lg text-black font-bold transition duration-200 ease-in-out
+      ${participationStatus === "none" ? "bg-[#FFF5B1]" : "border border-gray-400 bg-white"}
+    `}
           >
             不參加
           </button>
+
+          {/* 代辦 */}
           <button
             type="button"
             onClick={() => setParticipationStatus("agent")}
-            className={`btn w-1/3 ${
-              participationStatus === "agent" ? "btn-warning" : "btn-outline"
-            }`}
+            className={`w-1/3 px-4 py-2 rounded-lg text-black font-bold transition duration-200 ease-in-out
+      ${participationStatus === "agent" ? "bg-[#ADE3DA]" : "border border-gray-400 bg-white"}
+    `}
           >
             代辦
           </button>
@@ -279,7 +284,11 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
           </div>
         )}
 
-        <button type="submit" className="btn btn-primary w-full">
+        {/* 送出按鈕 */}
+        <button
+          type="submit"
+          className="w-full mt-4 px-6 py-3 rounded-lg bg-[#78AEE5] text-white text-lg font-bold hover:opacity-90"
+        >
           送出報名
         </button>
         {error && <p className="text-red-500 text-center">{error}</p>}
