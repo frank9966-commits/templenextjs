@@ -6,6 +6,7 @@ import ExportExcel from "../../../components/donations/ExportExcel";
 interface Donation {
   id: number;
   participant_id?: number;
+  event_id?: number;
   donation_amount?: number;
   created_at: string;
   donations_memo?: string;
@@ -17,6 +18,8 @@ interface Donation {
   } | null;
   donations_events?: {
     title: string;
+    id: number;
+    total_amount: number;
   } | null;
 }
 
@@ -32,7 +35,7 @@ export default function DonationDashboard() {
         .select(`
           *,
           participants(name, id_card, birthday, address),
-          donations_events(title)
+          donations_events(id, title, total_amount)
         `);
 
 
@@ -48,17 +51,46 @@ export default function DonationDashboard() {
 
   // 刪除捐款紀錄
   const deleteDonation = async (id: number) => {
-    if (confirm(`確定要刪除捐款者「${name}」的資料嗎？`)) {
-      const { error } = await supabase.from("donations").delete().eq("id", id);
+    const donation = donations.find((d) => d.id === id);
 
-      if (!error) {
+    if (!donation) {
+      alert("找不到該筆捐款資料");
+      return;
+    }
+
+    const eventId = donation?.event_id || null;
+    const donationAmount = donation.donation_amount || 0;
+
+    if (!eventId) {
+      alert("找不到對應的活動 ID，無法加回金額");
+      return;
+    }
+
+    if (confirm(`確定要刪除捐款者「${donation.participants?.name ?? "未知"}」的捐款資料嗎？`)) {
+      // 1️⃣：先更新 donations_events 的 total_amount 金額
+      const { error: updateError } = await supabase.rpc("add_amount", {
+        event_id_input: eventId,
+        amount_input: Number(donationAmount), // 👈 這裡要確保是數字
+      });
+
+      if (updateError) {
+        alert("加回金額失敗：" + updateError.message);
+        return;
+      }
+
+      // 2️⃣：再刪除這筆資料
+      const { error: deleteError } = await supabase.from("donations").delete().eq("id", id);
+
+      if (!deleteError) {
         setDonations((prev) => prev.filter((d) => d.id !== id));
-        alert("成功刪除捐款資料！");
+        alert("成功刪除捐款資料並加回金額！");
       } else {
-        alert("刪除失敗：" + error.message);
+        alert("刪除失敗：" + deleteError.message);
       }
     }
   };
+
+
 
   const headers = [
     "身分證",
