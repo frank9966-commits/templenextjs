@@ -51,7 +51,8 @@ export default function DonationDashboard() {
           *,
           participants(name, id_card, birthday, address),
           donations_events(id, title, total_amount)
-        `);
+        `)
+        .order("created_at", { ascending: false }); // ⬅️ 這行就是關鍵;
 
 
       if (error) {

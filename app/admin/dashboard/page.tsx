@@ -36,7 +36,8 @@ export default function AdminDashboard() {
     async function fetchParticipants() {
       const { data, error } = await supabase
         .from("participants")
-        .select("*, events(title)");
+        .select("*, events(title)")
+        .order("created_at", { ascending: false });
 
       if (error) {
         setError("取得資料失敗：" + error.message);
