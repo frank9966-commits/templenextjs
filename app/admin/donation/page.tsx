@@ -27,6 +27,21 @@ export default function DonationDashboard() {
   const [donations, setDonations] = useState<Donation[]>([]);
   const [error, setError] = useState<string>("");
 
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
+
+  const filteredDonations = selectedEventId
+    ? donations.filter((d) => d.event_id === selectedEventId)
+    : donations;
+
+  // 取出所有活動選項（不重複）
+  const eventOptions = Array.from(
+    new Map(
+      donations
+        .filter((d) => d.donations_events)
+        .map((d) => [d.donations_events!.id, d.donations_events])
+    ).values()
+  );
+
   // 取得捐款資料
   useEffect(() => {
     async function fetchDonations() {
@@ -105,15 +120,36 @@ export default function DonationDashboard() {
 
   return (
     <div className="w-full mx-auto p-4 bg-base-200">
+      <div className="mb-4">
+        <label className="mr-2">篩選活動：</label>
+        <select
+          className="select select-bordered select-sm w-52"
+          value={selectedEventId ?? ""}
+          onChange={(e) => {
+            const val = e.target.value;
+            setSelectedEventId(val === "" ? null : Number(val));
+          }}
+        >
+          <option value="">全部活動</option>
+          {eventOptions.map((event) => (
+            <option key={event?.id} value={event?.id}>
+              {event?.title}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className="text-right mb-4">
-        <ExportExcel data={donations} filename="捐款資料.xlsx" />
+        <ExportExcel data={filteredDonations} filename="捐款資料.xlsx" />
       </div>
       {error && <p className="text-red-500 text-center">{error}</p>}
-
-      {/* <div className="text-right mb-4">
-        <ExportExcel data={donations} filename="捐款資料.xlsx" />
-      </div> */}
-
+      {selectedEventId && (
+        <h2 className="text-xl font-bold mb-2">
+          當前活動：{
+            eventOptions.find((e) => e?.id === selectedEventId)?.title || "未知活動"
+          }
+        </h2>
+      )}
       <div className="overflow-x-auto max-h-[700px]">
         <table className="min-w-[1200px] table-auto border-collapse border border-gray-300">
           <thead className="bg-gray-200 sticky top-0 z-20">
@@ -127,7 +163,7 @@ export default function DonationDashboard() {
             </tr>
           </thead>
           <tbody>
-            {donations.map((d) => (
+            {filteredDonations.map((d) => (
               <tr key={d.id} className="border border-gray-300">
                 <td className="border border-gray-300 p-2">
                   <button
