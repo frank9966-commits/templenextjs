@@ -280,18 +280,41 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
                   className="input input-bordered w-full"
                 />
               </div>
-              {/* 🔧 顯示性別 */}
+              {/* 🔧 修改為可選擇性別（主申請人） */}
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">性別</span>
                 </label>
-                <input
-                  type="text"
-                  value={basicInfo.sex || ""}
-                  readOnly
-                  className="input input-bordered w-full"
-                />
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="basic-sex"
+                      value="男"
+                      checked={basicInfo.sex === "男"}
+                      onChange={(e) =>
+                        setBasicInfo({ ...basicInfo, sex: e.target.value })
+                      }
+                      className="radio border-blue-400 checked:bg-blue-500"
+                    />
+                    <span>信士(男)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="basic-sex"
+                      value="女"
+                      checked={basicInfo.sex === "女"}
+                      onChange={(e) =>
+                        setBasicInfo({ ...basicInfo, sex: e.target.value })
+                      }
+                      className="radio border-orange-400 checked:bg-orange-400"
+                    />
+                    <span>信女(女)</span>
+                  </label>
+                </div>
               </div>
+
 
               <div className="form-control">
                 <label className="label">
@@ -382,17 +405,41 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
                           />
                         </div>
                         {/* 🔧 顯示性別 */}
+                        {/* 🔧 修改為可選擇性別（家族成員） */}
                         <div className="form-control">
                           <label className="label">
                             <span className="label-text">性別</span>
                           </label>
-                          <input
-                            type="text"
-                            value={member.sex || ""}
-                            readOnly
-                            className="input input-bordered w-full"
-                          />
+                          <div className="flex gap-4">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`sex-${index}`}
+                                value="男"
+                                checked={member.sex === "男"}
+                                onChange={(e) =>
+                                  handleFamilyMemberChange(index, "sex", e.target.value)
+                                }
+                                className="radio border-blue-400 checked:bg-blue-500"
+                              />
+                              <span>信士(男)</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`sex-${index}`}
+                                value="女"
+                                checked={member.sex === "女"}
+                                onChange={(e) =>
+                                  handleFamilyMemberChange(index, "sex", e.target.value)
+                                }
+                                className="radio border-orange-400 checked:bg-orange-400"
+                              />
+                              <span>信女(女)</span>
+                            </label>
+                          </div>
                         </div>
+
                         <div className="form-control">
                           <label className="label">
                             <span className="label-text">地址</span>
