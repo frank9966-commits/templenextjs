@@ -429,17 +429,10 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
                             max={_currentEvent.total_amount}
                           />
                         </div>
-                        {/* <button
-                          type="button"
-                          onClick={() => handleUpdateMember(member)}
-                          className="btn btn-primary w-full"
-                        >
-                          提交
-                        </button> */}
                         <button
                           type="button"
                           onClick={() => handleFamilyDonation(index, member)}
-                          className="btn btn-secondary w-full mt-2"
+                          className="btn w-full mt-2 px-6 py-3 rounded-lg bg-[#F57C00] text-white text-lg font-bold hover:opacity-90"
                         >
                           捐款
                         </button>
