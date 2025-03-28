@@ -19,6 +19,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
   const [memo, setMemo] = useState("");
   const [zodiacSign, setZodiacSign] = useState("");
   const [eventDate, setEventDate] = useState("");
+  const [sex, setSex] = useState("");
   const [agencyName, setAgencyName] = useState("");
 
   const [participationStatus, setParticipationStatus] = useState<ParticipationStatus | null>(null);
@@ -45,6 +46,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
     const trimmedMemo = memo.trim();
     const trimmedZodiacSign = zodiacSign.trim();
     const trimmedEventDate = eventDate.trim();
+    const trimmedSex = sex.trim();
     const trimmedAgencyName = agencyName.trim();
 
     if (!trimmedIdCard || !trimmedName || !trimmedAddress || !trimmedBirthday || !participationStatus) {
@@ -68,6 +70,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       memo: trimmedMemo,
       participation_status: participationStatus,
       event_date: trimmedEventDate,
+      sex: trimmedSex,
       agency_name: participationStatus === "agent" ? trimmedAgencyName : null,
     };
 
@@ -130,6 +133,37 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
             }
             className="input input-bordered w-full"
           />
+        </div>
+
+        {/* 🔧 新增的性別欄位 */}
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text">性別</span>
+          </label>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="sex"
+                value="男"
+                checked={sex === "男"}
+                onChange={(e) => setSex(e.target.value)}
+                className="radio border-blue-400 checked:bg-blue-500"
+              />
+              <span>信士(男)</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="sex"
+                value="女"
+                checked={sex === "女"}
+                onChange={(e) => setSex(e.target.value)}
+                className="radio border-orange-400 checked:bg-orange-400"
+              />
+              <span>信女(女)</span>
+            </label>
+          </div>
         </div>
 
         <div className="form-control">

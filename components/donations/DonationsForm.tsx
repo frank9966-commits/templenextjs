@@ -14,6 +14,7 @@ const DonationsForm: React.FC<DonationsFormProps> = ({ currentEvent }) => {
   const [donations_memo, setDonations_memo] = useState("");
   const [donationAmount, setDonationAmount] = useState("");
   const [error, setError] = useState("");
+  const [sex, setSex] = useState("");
 
   useEffect(() => {
     if (error) {
@@ -29,7 +30,7 @@ const DonationsForm: React.FC<DonationsFormProps> = ({ currentEvent }) => {
     setError("");
 
     // 1. 檢查必填欄位
-    if (!idCard || !basicInfo?.name || !address || !birthday || !donationAmount) {
+    if (!idCard || !basicInfo?.name || !address || !birthday || !sex || !donationAmount) {
       setError("所有欄位皆為必填，請完整填寫表單。");
       return;
     }
@@ -49,6 +50,7 @@ const DonationsForm: React.FC<DonationsFormProps> = ({ currentEvent }) => {
       birthday,
       donations_events: currentEvent.id,
       family_id: familyId || idCard.toUpperCase(),
+      sex,
     };
 
     // 5. 先檢查參與者是否存在，取得 participantId
@@ -164,6 +166,36 @@ const DonationsForm: React.FC<DonationsFormProps> = ({ currentEvent }) => {
             }
             className="input input-bordered w-full"
           />
+        </div>
+        {/* 🔧 性別欄位 */}
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text">性別</span>
+          </label>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="sex"
+                value="男"
+                checked={sex === "男"}
+                onChange={(e) => setSex(e.target.value)}
+                className="radio border-blue-400 checked:bg-blue-500"
+              />
+              <span>信士(男)</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="sex"
+                value="女"
+                checked={sex === "女"}
+                onChange={(e) => setSex(e.target.value)}
+                className="radio border-orange-400 checked:bg-orange-400"
+              />
+              <span>信女(女)</span>
+            </label>
+          </div>
         </div>
         {/* 地址 */}
         <div className="form-control">

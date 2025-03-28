@@ -6,6 +6,7 @@ import ExportExcel from "@/components/ExportExcel"; // ✅ 引入 Excel 匯出�
 interface Participant {
   id: number;
   id_card: string;
+  sex?: string;
   name: string;
   password?: string;
   participation_status?: "join" | "none" | "agent"; // 更新為三種狀態
@@ -138,6 +139,7 @@ export default function AdminDashboard() {
   // 表頭陣列，新增「角色」欄位
   const headers = [
     "姓名",
+    "性別",
     "活動名稱",
     "身分證",
     "地址",
@@ -201,6 +203,7 @@ export default function AdminDashboard() {
                     </button>
                   </td>
                   <td className="border border-gray-300 p-2 font-bold">{p.name}</td>
+                  <td className="border border-gray-300 p-2 font-bold">{p.sex || "-"}</td>
                   <td className="border border-gray-300 p-2">
                     {p.events ? p.events.title : "-"}
                   </td>

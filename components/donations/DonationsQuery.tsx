@@ -16,6 +16,7 @@ export interface Participant {
   event_id?: number;
   donations_memo?: string;
   agency_name?: string;
+  sex?: string;
 }
 
 const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentEvent }) => {
@@ -30,6 +31,7 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
     event_id?: number;
     donations_memo?: string;
     agency_name?: string;
+    sex?: string;
   } | null>(null);
   const [error, setError] = useState("");
   const [familyMembers, setFamilyMembers] = useState<Participant[]>([]);
@@ -75,6 +77,7 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
         family_id: data.family_id || normalizedId,
         donations_memo: data.donations_memo,
         agency_name: data.agency_name || "",
+        sex: data.sex || "",
       });
       setParticipantId(data.id);
 
@@ -277,6 +280,19 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
                   className="input input-bordered w-full"
                 />
               </div>
+              {/* 🔧 顯示性別 */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">性別</span>
+                </label>
+                <input
+                  type="text"
+                  value={basicInfo.sex || ""}
+                  readOnly
+                  className="input input-bordered w-full"
+                />
+              </div>
+
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">地址</span>
@@ -363,6 +379,18 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
                             className="input input-bordered"
                             value={member.name || ""}
                             readOnly
+                          />
+                        </div>
+                        {/* 🔧 顯示性別 */}
+                        <div className="form-control">
+                          <label className="label">
+                            <span className="label-text">性別</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={member.sex || ""}
+                            readOnly
+                            className="input input-bordered w-full"
                           />
                         </div>
                         <div className="form-control">

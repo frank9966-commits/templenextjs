@@ -15,6 +15,7 @@ interface Donation {
     id_card: string;
     birthday: string;
     address: string;
+    sex?: string;
   } | null;
   donations_events?: {
     title: string;
@@ -111,6 +112,7 @@ export default function DonationDashboard() {
   const headers = [
     "身分證",
     "姓名",
+    "性別",
     "生辰",
     "地址",
     "活動名稱",
@@ -176,6 +178,7 @@ export default function DonationDashboard() {
                 </td>
                 <td className="border border-gray-300 p-2">{d.participants?.id_card || "-"}</td>
                 <td className="border border-gray-300 p-2">{d.participants?.name || "-"}</td>
+                <td className="border border-gray-300 p-2">{d.participants?.sex || "-"}</td>
                 <td className="border border-gray-300 p-2">{d.participants?.birthday || "-"}</td>
                 <td className="border border-gray-300 p-2">{d.participants?.address || "-"}</td>
                 <td className="border border-gray-300 p-2">

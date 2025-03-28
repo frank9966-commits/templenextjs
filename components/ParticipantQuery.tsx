@@ -17,6 +17,7 @@ export interface Participant {
   zodiac_sign?: string;
   memo?: string;
   agency_name?: string;
+  sex?: string;
 }
 
 const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _currentEvent }) => {
@@ -34,6 +35,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     zodiac_sign?: string;
     memo?: string;
     agency_name?: string;
+    sex?: string;
   } | null>(null);
   const [error, setError] = useState("");
   const [familyMembers, setFamilyMembers] = useState<Participant[]>([]);
@@ -73,6 +75,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
         zodiac_sign: data.zodiac_sign,
         memo: data.memo,
         agency_name: data.agency_name || "",
+        sex: data.sex || "",
       });
 
       if (data.family_id || normalizedId) {
@@ -130,6 +133,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       event_id: latestEvent.id,
       admin_viewed: false,
       agency_name: member.agency_name || "",
+      sex: member.sex || "",
     };
 
 
@@ -174,6 +178,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       event_id: latestEvent.id,
       admin_viewed: false,
       agency_name: basicInfo.agency_name || "",
+      sex: basicInfo.sex || "",
     };
 
 
@@ -237,6 +242,37 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                   className="input input-bordered w-full"
                 />
               </div>
+              {/* 🔧 新增性別欄位 */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">性別</span>
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="sex"
+                      value="男"
+                      checked={basicInfo.sex === "男"}
+                      onChange={(e) => setBasicInfo({ ...basicInfo, sex: e.target.value })}
+                      className="radio border-blue-400 checked:bg-blue-500"
+                    />
+                    <span>信士(男)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="sex"
+                      value="女"
+                      checked={basicInfo.sex === "女"}
+                      onChange={(e) => setBasicInfo({ ...basicInfo, sex: e.target.value })}
+                      className="radio border-orange-400 checked:bg-orange-400"
+                    />
+                    <span>信女(女)</span>
+                  </label>
+                </div>
+              </div>
+
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">地址</span>
@@ -416,6 +452,40 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                               handleFamilyMemberChange(index, "name", e.target.value)
                             }
                           />
+                        </div>
+                        {/* 🔧 新增性別欄位 */}
+                        <div className="form-control">
+                          <label className="label">
+                            <span className="label-text">性別</span>
+                          </label>
+                          <div className="flex gap-4">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`sex-${index}`}
+                                value="男"
+                                checked={member.sex === "男"}
+                                onChange={(e) =>
+                                  handleFamilyMemberChange(index, "sex", e.target.value)
+                                }
+                                className="radio border-blue-400 checked:bg-blue-500"
+                              />
+                              <span>信士(男)</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`sex-${index}`}
+                                value="女"
+                                checked={member.sex === "女"}
+                                onChange={(e) =>
+                                  handleFamilyMemberChange(index, "sex", e.target.value)
+                                }
+                                className="radio border-orange-400 checked:bg-orange-400"
+                              />
+                              <span>信女(女)</span>
+                            </label>
+                          </div>
                         </div>
                         <div className="form-control">
                           <label className="label">

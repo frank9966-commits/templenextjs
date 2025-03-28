@@ -5,6 +5,7 @@ interface Participant {
   id: number;
   id_card: string;
   name: string;
+  sex?: string;
   participation_status?: string;
   address?: string;
   birthday?: string;
@@ -34,6 +35,7 @@ export default function ExportExcel({ data, filename = "報名資料.xlsx" }: Ex
 
     const worksheetData = data.map((p) => ({
       姓名: p.name,
+      性別: p.sex,
       活動名稱: p.events ? p.events.title : "-",
       身分證: p.id_card,
       地址: p.address || "-",

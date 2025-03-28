@@ -11,6 +11,7 @@ export interface Donation {
   participants: {
     name: string;
     id_card: string;
+    sex?: string;
     birthday: string;
     address: string;
   } | null;
@@ -29,6 +30,7 @@ export default function ExportExcel({ data, filename }: ExportExcelProps) {
     const exportData = data.map((item) => ({
       身分證: item.participants?.id_card || "-",
       姓名: item.participants?.name || "-",
+      性別: item.participants?.sex || "-",
       生辰: item.participants?.birthday || "-",
       地址: item.participants?.address || "-",
       活動名稱: item.donations_events?.title || "-",
