@@ -638,7 +638,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
                         <button
                           type="button"
                           onClick={() => handleUpdateMember(member)}
-                          className="btn w-full mt-2 px-6 py-3 rounded-lg bg-[#F57C00] text-white text-lg font-bold hover:opacity-90"
+                          className="w-full mt-4 px-6 py-3 rounded-lg bg-[#78AEE5] text-white text-lg font-bold hover:opacity-90"
                         >
                           提交
                         </button>
