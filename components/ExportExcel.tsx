@@ -33,7 +33,14 @@ export default function ExportExcel({ data, filename = "報名資料.xlsx" }: Ex
       return;
     }
 
-    const worksheetData = data.map((p) => ({
+    // ✅ 依 family_id（關係人）排序
+    const sortedData = [...data].sort((a, b) => {
+      const fa = a.family_id ?? "";
+      const fb = b.family_id ?? "";
+      return fa.localeCompare(fb);
+    });
+
+    const worksheetData = sortedData.map((p) => ({
       姓名: p.name,
       性別: p.sex,
       活動名稱: p.events ? p.events.title : "-",
@@ -56,7 +63,6 @@ export default function ExportExcel({ data, filename = "報名資料.xlsx" }: Ex
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "報名資料");
 
-    // 下載 Excel 檔案
     XLSX.writeFile(workbook, filename);
   };
 
