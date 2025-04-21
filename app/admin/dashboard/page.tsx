@@ -38,7 +38,7 @@ export default function AdminDashboard() {
       const { data, error } = await supabase
         .from("participants")
         .select("*, events(title)")
-        .order("agency_name", { ascending: true }) // ✅ 先依代理人排序
+        .order("family_id", { ascending: true }) // ✅ 先依關係人排序
         .order("created_at", { ascending: false }); // ✅ 再依創建時間排序（可選）
 
       if (error) {
