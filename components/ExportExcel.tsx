@@ -48,7 +48,11 @@ export default function ExportExcel({ data, filename = "報名資料.xlsx" }: Ex
       地址: p.address || "-",
       生辰: p.birthday || "-",
       生肖: p.zodiac_sign || "-",
-      是否參加: p.participation_status === "join" ? "參加" : "不參加",
+      是否參加: p.participation_status === "join"
+        ? "參加"
+        : p.participation_status === "agent"
+          ? "代辦"
+          : "不參加",
       代辦者姓名: p.agency_name || "-",
       關係人: p.family_id || "-",
       參加梯次: p.family_id || "-",
