@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 interface DonationsFormProps {
@@ -6,6 +7,7 @@ interface DonationsFormProps {
 }
 
 const DonationsForm: React.FC<DonationsFormProps> = ({ currentEvent }) => {
+  const router = useRouter();
   const [idCard, setIdCard] = useState("");
   const [basicInfo, setBasicInfo] = useState<{ name: string } | null>({ name: "" });
   const [address, setAddress] = useState("");
@@ -133,7 +135,7 @@ const DonationsForm: React.FC<DonationsFormProps> = ({ currentEvent }) => {
     }
 
     alert("註冊與捐款成功！\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊");
-    window.location.reload();
+    router.push("/");
   };
 
   return (
