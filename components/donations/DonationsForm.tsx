@@ -88,24 +88,8 @@ const DonationsForm: React.FC<DonationsFormProps> = ({ currentEvent }) => {
       participantId = existed.id;
     }
 
-    // 6. 進行捐款：每次都「新增一筆」捐款紀錄
-    const { error: donationError } = await supabase
-      .from("donations")
-      .insert([
-        {
-          event_id: currentEvent.id,
-          participant_id: participantId,
-          donation_amount: donationAmountNum,
-          donations_memo: donations_memo,
-        },
-      ]);
-
-    if (donationError) {
-      setError("捐款失敗：" + donationError.message);
-      return;
-    }
-
-    // 7. 更新活動的總金額（假設 donations_events 表中有 total_amount）
+    // 6. 先更新活動總金額（使用樂觀鎖 Optimistic Locking 防止超賣）
+    // 取得當前活動資料
     const { data: eventData, error: eventFetchError } = await supabase
       .from("donations_events")
       .select("id, total_amount")
@@ -124,13 +108,43 @@ const DonationsForm: React.FC<DonationsFormProps> = ({ currentEvent }) => {
     }
 
     const newTotal = eventData.total_amount - donationAmountNum;
-    const { error: updateEventError } = await supabase
+
+    // 嘗試更新金額，並檢查 total_amount 是否仍為我們剛讀取的值 (樂觀鎖)
+    const { data: updatedEvent, error: updateEventError } = await supabase
       .from("donations_events")
       .update({ total_amount: newTotal })
-      .eq("id", currentEvent.id);
+      .eq("id", currentEvent.id)
+      .eq("total_amount", eventData.total_amount) // 關鍵：確保更新時金額未被其他人修改
+      .select();
 
     if (updateEventError) {
       setError("更新活動總金額失敗：" + updateEventError.message);
+      return;
+    }
+
+    // 如果沒有更新任何資料，表示 total_amount 已經被其他人改過了
+    if (!updatedEvent || updatedEvent.length === 0) {
+      setError("很抱歉，就在剛才額度已被搶光或變動，請重新嘗試。");
+      return;
+    }
+
+    // 7. 進行捐款：新增捐款紀錄
+    const { error: donationError } = await supabase
+      .from("donations")
+      .insert([
+        {
+          event_id: currentEvent.id,
+          participant_id: participantId,
+          donation_amount: donationAmountNum,
+          donations_memo: donations_memo,
+        },
+      ]);
+
+    if (donationError) {
+      // 如果捐款紀錄插入失敗，理論上應該要補償(rollback)活動金額，但前端做 rollback 有風險。
+      // 這裡先提示錯誤，請管理員處理。
+      console.error("Critical Error: Quota deducted but donation record failed.", donationError);
+      setError("捐款紀錄建立失敗，但額度已扣除。請聯繫管理員處理。" + donationError.message);
       return;
     }
 
