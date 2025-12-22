@@ -6,6 +6,7 @@ export interface Donation {
   id: number;
   participant_id?: number;
   donation_amount?: number;
+  donation_status?: string;
   created_at: string;
   donations_memo?: string;
   participants: {
@@ -36,6 +37,12 @@ export default function ExportExcel({ data, filename }: ExportExcelProps) {
       活動名稱: item.donations_events?.title || "-",
       捐款金額: item.donation_amount || 0,
       捐款時間: new Date(item.created_at).toLocaleString(),
+      捐款狀態:
+        (item.donation_status === "未捐款"
+          ? "未匯款"
+          : item.donation_status === "已捐款"
+            ? "已匯款"
+            : item.donation_status) || "未匯款",
       備註: item.donations_memo || "-",
     }));
 

@@ -8,6 +8,7 @@ interface Donation {
   participant_id?: number;
   event_id?: number;
   donation_amount?: number;
+  donation_status?: string;
   created_at: string;
   donations_memo?: string;
   participants: {
@@ -50,7 +51,7 @@ export default function DonationDashboard() {
         .from("donations")
         .select(`
           *,
-          participants(name, id_card, birthday, address),
+          participants(name, id_card, birthday, address, sex),
           donations_events(id, title, total_amount)
         `)
         .order("created_at", { ascending: false }); // ⬅️ 這行就是關鍵;
@@ -65,6 +66,22 @@ export default function DonationDashboard() {
     }
     fetchDonations();
   }, []);
+
+  const updateDonationStatus = async (id: number, newStatus: string) => {
+    const { error } = await supabase
+      .from("donations")
+      .update({ donation_status: newStatus })
+      .eq("id", id);
+
+    if (!error) {
+      setDonations((prev) =>
+        prev.map((d) => (d.id === id ? { ...d, donation_status: newStatus } : d))
+      );
+    } else {
+      console.error("更新捐款狀態失敗：", error);
+      alert("更新捐款狀態失敗：" + error.message);
+    }
+  };
 
   // 刪除捐款紀錄
   const deleteDonation = async (id: number) => {
@@ -118,6 +135,7 @@ export default function DonationDashboard() {
     "活動名稱",
     "捐款金額",
     "捐款時間",
+    "捐款狀態",
     "備註",
   ];
 
@@ -187,6 +205,16 @@ export default function DonationDashboard() {
                 <td className="border border-gray-300 p-2">{d.donation_amount}</td>
                 <td className="border border-gray-300 p-2">
                   {new Date(d.created_at).toLocaleString()}
+                </td>
+                <td className="border border-gray-300 p-2">
+                  <select
+                    className="border p-1 rounded"
+                    value={(d.donation_status === "未捐款" ? "未匯款" : d.donation_status === "已捐款" ? "已匯款" : d.donation_status) || "未匯款"}
+                    onChange={(e) => updateDonationStatus(d.id, e.target.value)}
+                  >
+                    <option value="未匯款">未匯款</option>
+                    <option value="已匯款">已匯款</option>
+                  </select>
                 </td>
                 <td className="border border-gray-300 p-2">{d.donations_memo || "-"}</td>
               </tr>
