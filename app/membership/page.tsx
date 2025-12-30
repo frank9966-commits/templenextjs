@@ -14,6 +14,7 @@ type MembershipRow = {
   effective_from: DateOnly;
   expires_on: DateOnly;
   next_due_on: DateOnly;
+  cycle_months?: number;
   status: "active" | "inactive";
 };
 
@@ -30,6 +31,7 @@ type RenewalRow = {
 export default function MembershipRenewPage() {
   const [idCard, setIdCard] = useState("");
   const [membership, setMembership] = useState<MembershipRow | null>(null);
+  const [memberName, setMemberName] = useState<string | null>(null);
   const [latestRenewal, setLatestRenewal] = useState<RenewalRow | null>(null);
   const [checked, setChecked] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -52,6 +54,7 @@ export default function MembershipRenewPage() {
     setCycleMonths(null);
     setChecked(false);
     setMembership(null);
+    setMemberName(null);
     setLatestRenewal(null);
 
     if (!normalizedIdCard) {
@@ -73,7 +76,7 @@ export default function MembershipRenewPage() {
         // 進一步判斷：是沒註冊？還是已註冊但尚未建立會籍？
         const { data: p, error: pErr } = await supabase
           .from("participants")
-          .select("id_card")
+          .select("id_card, name")
           .eq("id_card", normalizedIdCard)
           .maybeSingle();
 
@@ -83,6 +86,7 @@ export default function MembershipRenewPage() {
         if (!p) {
           setInfo("查無此身分證資料，請先完成註冊或洽管理員。");
         } else {
+          setMemberName((p as { name?: string } | null)?.name ?? null);
           setInfo("已找到會員資料，但尚未建立會籍，請洽管理員開通會籍。");
         }
         return;
@@ -90,6 +94,17 @@ export default function MembershipRenewPage() {
 
       const membershipRow = m as MembershipRow;
       setMembership(membershipRow);
+
+      // 取得姓名（顯示用）
+      const { data: p2, error: p2Err } = await supabase
+        .from("participants")
+        .select("name")
+        .eq("id_card", membershipRow.id_card)
+        .maybeSingle();
+
+      if (!p2Err && p2) {
+        setMemberName((p2 as { name?: string } | null)?.name ?? null);
+      }
 
       const { data: r, error: rErr } = await supabase
         .from("membership_renewal_requests")
@@ -181,6 +196,7 @@ export default function MembershipRenewPage() {
         .update({
           expires_on: newExpiresOn,
           next_due_on: newNextDueOn,
+          cycle_months: cycleMonths,
           last_renew_requested_at: new Date().toISOString(),
           status: "active",
         })
@@ -266,6 +282,9 @@ export default function MembershipRenewPage() {
               <div className="card bg-base-200/60 shadow-inner">
                 <div className="card-body space-y-2">
                   <p className="text-center font-bold">會籍資訊</p>
+                  <p className="text-sm text-center text-gray-700">
+                    姓名：{memberName ?? "-"}｜身分證：{membership.id_card}
+                  </p>
                   <p className="text-sm text-center text-gray-700">
                     生效日：{membership.effective_from}｜到期日：{membership.expires_on}
                   </p>

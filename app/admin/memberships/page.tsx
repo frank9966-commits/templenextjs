@@ -10,6 +10,9 @@ import {
   isReminderNeeded,
   type DateOnly,
 } from "@/lib/membership";
+import ExportMembershipExcel, {
+  type MembershipExportRow,
+} from "@/components/memberships/ExportExcel";
 
 type MembershipRow = {
   id: number;
@@ -17,6 +20,7 @@ type MembershipRow = {
   effective_from: DateOnly;
   expires_on: DateOnly;
   next_due_on: DateOnly;
+  cycle_months: number;
   status: "active" | "inactive";
   last_renew_requested_at: string | null;
   last_paid_confirmed_at: string | null;
@@ -25,6 +29,7 @@ type MembershipRow = {
 type ParticipantRow = {
   id_card: string;
   name: string;
+  is_member?: boolean;
 };
 
 type RenewalRow = {
@@ -58,12 +63,19 @@ export default function AdminMembershipsPage() {
   const [error, setError] = useState<string>("");
 
   const [openCandidates, setOpenCandidates] = useState<ParticipantRow[]>([]);
+  const [allParticipants, setAllParticipants] = useState<ParticipantRow[]>([]);
   const [selectedIdCard, setSelectedIdCard] = useState<string>("");
   const [effectiveFrom, setEffectiveFrom] = useState<DateOnly>(
     formatDateOnly(new Date())
   );
+  const [expiresOn, setExpiresOn] = useState<DateOnly | null>(null);
   const [openLoading, setOpenLoading] = useState(false);
   const [openMessage, setOpenMessage] = useState<string>("");
+
+  const [memberSelectedIdCard, setMemberSelectedIdCard] = useState<string>("");
+  const [memberIsMember, setMemberIsMember] = useState<boolean>(false);
+  const [memberLoading, setMemberLoading] = useState(false);
+  const [memberMessage, setMemberMessage] = useState<string>("");
 
   const refresh = async () => {
     setLoading(true);
@@ -72,7 +84,7 @@ export default function AdminMembershipsPage() {
     const { data: ms, error: msErr } = await supabase
       .from("memberships")
       .select(
-        "id, id_card, effective_from, expires_on, next_due_on, status, last_renew_requested_at, last_paid_confirmed_at"
+        "id, id_card, effective_from, expires_on, next_due_on, cycle_months, status, last_renew_requested_at, last_paid_confirmed_at"
       )
       .order("next_due_on", { ascending: true });
 
@@ -87,20 +99,29 @@ export default function AdminMembershipsPage() {
 
     // 開通會籍候選：participants 中尚未建立 memberships 的人
     {
-      const { data: allParticipants, error: allErr } = await supabase
+      const { data: aps, error: allErr } = await supabase
         .from("participants")
-        .select("id_card, name")
+        .select("id_card, name, is_member")
         .order("created_at", { ascending: false });
 
-      if (!allErr && allParticipants) {
+      if (!allErr && aps) {
+        const all = aps as ParticipantRow[];
+        setAllParticipants(all);
         const membershipIdCardSet = new Set(membershipRows.map((m) => m.id_card));
-        const candidates = (allParticipants as ParticipantRow[])
+        const candidates = all
+          .filter((p) => (p.is_member ?? false) === true)
           .filter((p) => !membershipIdCardSet.has(p.id_card))
           .filter((p) => (p.id_card ?? "").trim().length > 0);
         setOpenCandidates(candidates);
         // 若目前選到的已不在候選清單，清空
         if (selectedIdCard && !candidates.some((c) => c.id_card === selectedIdCard)) {
           setSelectedIdCard("");
+        }
+
+        // 會員資格面板：若目前選到的已不存在，清空
+        if (memberSelectedIdCard && !all.some((c) => c.id_card === memberSelectedIdCard)) {
+          setMemberSelectedIdCard("");
+          setMemberIsMember(false);
         }
       }
     }
@@ -273,6 +294,22 @@ export default function AdminMembershipsPage() {
     await updateRenewal(renewalId, { admin_status: status });
   };
 
+  const updateMembership = async (
+    membershipId: number,
+    patch: Partial<Pick<MembershipRow, "cycle_months" | "effective_from" | "expires_on" | "next_due_on" | "status">>
+  ) => {
+    setError("");
+    const { error: updErr } = await supabase
+      .from("memberships")
+      .update(patch)
+      .eq("id", membershipId);
+    if (updErr) {
+      setError(updErr.message);
+      return;
+    }
+    await refresh();
+  };
+
   const handleOpenMembership = async () => {
     setError("");
     setOpenMessage("");
@@ -311,26 +348,93 @@ export default function AdminMembershipsPage() {
         return;
       }
 
-      const expiresOn = endOfMonth(effectiveFrom);
-      const nextDueOn = addDays(expiresOn, 1);
+      const finalExpiresOn = expiresOn ?? endOfMonth(effectiveFrom);
+      const nextDueOn = addDays(finalExpiresOn, 1);
 
       const { error: insErr } = await supabase.from("memberships").insert({
         id_card: idCard,
         effective_from: effectiveFrom,
-        expires_on: expiresOn,
+        expires_on: finalExpiresOn,
         next_due_on: nextDueOn,
+        cycle_months: 1,
         status: "active",
       });
 
       if (insErr) throw insErr;
 
-      setOpenMessage(`開通成功：到期日 ${expiresOn}，下次應繳日 ${nextDueOn}`);
+      setOpenMessage(`開通成功：到期日 ${finalExpiresOn}，下次應繳日 ${nextDueOn}`);
       setSelectedIdCard("");
+      setExpiresOn(null);
       await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "開通失敗");
     } finally {
       setOpenLoading(false);
+    }
+  };
+
+  const handleUpdateMemberFlag = async () => {
+    setError("");
+    setMemberMessage("");
+
+    const idCard = (memberSelectedIdCard || "").trim().toUpperCase();
+    if (!idCard) {
+      setMemberMessage("請先選擇會員");
+      return;
+    }
+
+    setMemberLoading(true);
+    try {
+      const { error: updErr } = await supabase
+        .from("participants")
+        .update({ is_member: memberIsMember })
+        .eq("id_card", idCard);
+
+      if (updErr) throw updErr;
+
+      const { data: existing, error: exErr } = await supabase
+        .from("memberships")
+        .select("id")
+        .eq("id_card", idCard)
+        .maybeSingle();
+
+      if (exErr) throw exErr;
+
+      if (memberIsMember) {
+        // 設為會員：若尚未有會籍則建立
+        if (!existing) {
+          const finalExpiresOn = expiresOn ?? endOfMonth(effectiveFrom);
+          const nextDueOn = addDays(finalExpiresOn, 1);
+
+          const { error: insErr } = await supabase.from("memberships").insert({
+            id_card: idCard,
+            effective_from: effectiveFrom,
+            expires_on: finalExpiresOn,
+            next_due_on: nextDueOn,
+            cycle_months: 1,
+            status: "active",
+          });
+
+          if (insErr) throw insErr;
+          setMemberMessage(`已設為會員並建立會籍：到期日 ${finalExpiresOn}`);
+        } else {
+          // 已有會籍：確保狀態為 active
+          await supabase.from("memberships").update({ status: "active" }).eq("id_card", idCard);
+          setMemberMessage("已設為會員");
+        }
+      } else {
+        // 設為非會員：若有會籍則標記 inactive（不刪除資料）
+        if (existing) {
+          await supabase.from("memberships").update({ status: "inactive" }).eq("id_card", idCard);
+        }
+        setMemberMessage("已設為非會員");
+      }
+
+      await refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "更新失敗");
+    } finally {
+      setMemberLoading(false);
     }
   };
 
@@ -348,17 +452,117 @@ export default function AdminMembershipsPage() {
       });
   }, [memberships]);
 
+  const exportRows = useMemo<MembershipExportRow[]>(() => {
+    return reminderRows
+      .filter((m) => m.status === "active")
+      .map((m) => {
+      const name = nameByIdCard[m.id_card] ?? "-";
+      const latest = latestRenewalByMembershipId[m.id];
+      const paymentStatus = latest
+        ? latest.admin_status === "paid"
+          ? "已繳費"
+          : latest.admin_status === "unpaid"
+            ? "未繳費"
+            : "待審核"
+        : "-";
+      const cycleText = cycleLabel(m.cycle_months ?? 1);
+      const periodText = latest ? `${latest.period_start}~${latest.period_end}` : "-";
+      const lastPaid = m.last_paid_confirmed_at
+        ? new Date(m.last_paid_confirmed_at).toLocaleString()
+        : "-";
+
+      return {
+        姓名: name,
+        身分證: m.id_card,
+        生效日: m.effective_from,
+        到期日: m.expires_on,
+        應繳日: m.next_due_on,
+        提醒起算日: m.remindFrom,
+        需要提醒: m.needReminder ? "需要" : "-",
+        繳費狀態: paymentStatus,
+        繳費方式: cycleText,
+        續會期間: periodText,
+        最後確認收款: lastPaid,
+      };
+      });
+  }, [reminderRows, nameByIdCard, latestRenewalByMembershipId]);
+
   return (
     <div className="min-h-screen bg-base-200 p-4">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">會員繳費管理</h1>
-          <button className="btn btn-sm" onClick={() => void refresh()}>
-            重新整理
-          </button>
+          <div className="flex items-center gap-2">
+            <ExportMembershipExcel data={exportRows} filename="會籍清單.xlsx" />
+            <button className="btn btn-sm" onClick={() => void refresh()}>
+              重新整理
+            </button>
+          </div>
         </div>
 
         {error && <div className="alert alert-error mb-4">{error}</div>}
+
+        <div className="card bg-base-100 shadow mb-6">
+          <div className="card-body">
+            <h2 className="text-lg font-bold mb-3">會員資格設定</h2>
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
+              <div className="form-control flex-1">
+                <label className="label">
+                  <span className="label-text">選擇人員（姓名 / 身分證）</span>
+                </label>
+                <select
+                  className="select select-bordered w-full"
+                  value={memberSelectedIdCard}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    setMemberSelectedIdCard(next);
+                    const found = allParticipants.find((p) => p.id_card === next);
+                    setMemberIsMember((found?.is_member ?? false) === true);
+                  }}
+                >
+                  <option value="">請選擇人員</option>
+                  {allParticipants.map((p) => (
+                    <option key={p.id_card} value={p.id_card}>
+                      {p.name}（{p.id_card}）
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-control lg:w-56">
+                <label className="label">
+                  <span className="label-text">是否為會員</span>
+                </label>
+                <select
+                  className="select select-bordered w-full"
+                  value={memberIsMember ? "1" : "0"}
+                  onChange={(e) => setMemberIsMember(e.target.value === "1")}
+                >
+                  <option value="1">是</option>
+                  <option value="0">否</option>
+                </select>
+              </div>
+
+              <button
+                className="btn btn-primary w-full lg:w-40"
+                onClick={() => void handleUpdateMemberFlag()}
+                disabled={memberLoading}
+              >
+                {memberLoading ? "處理中..." : "儲存"}
+              </button>
+            </div>
+
+            <p className="text-xs text-gray-500 mt-2">
+              設為「是」會在尚未有會籍時建立 memberships；設為「否」會將既有會籍標記為 inactive。
+            </p>
+
+            {memberMessage && (
+              <div className="alert alert-info mt-3">
+                <span className="text-sm">{memberMessage}</span>
+              </div>
+            )}
+          </div>
+        </div>
 
         <div className="card bg-base-100 shadow mb-6">
           <div className="card-body">
@@ -394,6 +598,20 @@ export default function AdminMembershipsPage() {
                 />
               </div>
 
+              <div className="form-control lg:w-56">
+                <label className="label">
+                  <span className="label-text">到期日（可不填，預設月底）</span>
+                </label>
+                <input
+                  type="date"
+                  className="input input-bordered w-full"
+                  value={expiresOn ?? ""}
+                  onChange={(e) =>
+                    setExpiresOn((e.target.value || null) as DateOnly | null)
+                  }
+                />
+              </div>
+
               <button
                 className="btn btn-primary w-full lg:w-40"
                 onClick={() => void handleOpenMembership()}
@@ -404,7 +622,7 @@ export default function AdminMembershipsPage() {
             </div>
 
             <p className="text-xs text-gray-500 mt-2">
-              不會顯示已存在會籍（已續費/已開通）者
+              只會顯示「已設定為會員」且尚未建立會籍者
             </p>
 
             {openMessage && (
@@ -582,23 +800,23 @@ export default function AdminMembershipsPage() {
                           <td>{m.next_due_on}</td>
                           <td>{m.remindFrom}</td>
                           <td className="min-w-[220px]">
-                            {latest ? (
-                              <div className="flex flex-col gap-2">
-                                <select
-                                  className="select select-bordered select-sm"
-                                  value={latest.cycle_months}
-                                  onChange={(e) =>
-                                    void updateRenewal(latest.id, {
-                                      cycle_months: Number(e.target.value),
-                                    })
-                                  }
-                                >
-                                  <option value={1}>月繳</option>
-                                  <option value={3}>季繳</option>
-                                  <option value={6}>半年繳</option>
-                                  <option value={12}>年繳</option>
-                                </select>
+                            <div className="flex flex-col gap-2">
+                              <select
+                                className="select select-bordered select-sm"
+                                value={m.cycle_months ?? 1}
+                                onChange={(e) =>
+                                  void updateMembership(m.id, {
+                                    cycle_months: Number(e.target.value),
+                                  })
+                                }
+                              >
+                                <option value={1}>月繳</option>
+                                <option value={3}>季繳</option>
+                                <option value={6}>半年繳</option>
+                                <option value={12}>年繳</option>
+                              </select>
 
+                              {latest ? (
                                 <div className="flex gap-2">
                                   <button
                                     className="btn btn-xs btn-success"
@@ -613,10 +831,10 @@ export default function AdminMembershipsPage() {
                                     未繳費
                                   </button>
                                 </div>
-                              </div>
-                            ) : (
-                              <span className="text-xs text-gray-500">無續會申請</span>
-                            )}
+                              ) : (
+                                <span className="text-xs text-gray-500">無續會申請（僅設定預設繳費方式）</span>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );
