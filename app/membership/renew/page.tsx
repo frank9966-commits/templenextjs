@@ -259,16 +259,12 @@ export default function MembershipRenewPage() {
             <div className="text-sm text-gray-700 leading-7">
               <p className="text-center font-bold">🔸社團法人無極天王宮道教協會🔸</p>
               <p className="mt-3">
-                感恩各位善信大德與會員長年來的護持與支持,
-                <br />
-                使本協會得以持續為廣大善信服務,弘揚正信道教。
+                感恩各位善信大德長年來的護持與支持，使本協會得以持續為廣大善信服務，弘揚正信道教。
               </p>
               <p className="mt-3">
-                本協會目前持續招募會員中,
+                本協會目前持續招募會員中，
                 <br />
-                亦誠摯懇請舊會員繼續護持,共同成就道場建立,
-                <br />
-                宣揚無極天王弘法濟世之精神,普濟人間。
+                亦誠摯懇請舊會員繼續護持，共同成就道場建立，宣揚無極天王宮弘法濟世之精神，普濟人間。
               </p>
             </div>
 
