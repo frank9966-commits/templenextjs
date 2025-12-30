@@ -252,7 +252,20 @@ export default function MembershipRenewPage() {
       <div className="hero-content flex-col w-full max-w-lg mx-auto">
         <div className="card w-full shadow-xl bg-base-100">
           <div className="card-body space-y-4">
-            <h1 className="text-2xl font-bold text-center">會員續會</h1>
+            <h1 className="text-2xl font-bold text-center">
+              <span className="text-warning">◆</span> 會員續會 <span className="text-warning">◆</span>
+            </h1>
+
+            <div className="text-sm text-gray-700 leading-7">
+              <p>
+                無極天王宮道教協會
+                <br />
+                感恩各位善信大德與會員長年來的護持與支持，使本協會得以持續為廣大善信服務，弘揚正信道教。
+              </p>
+              <p className="mt-3">
+                本協會目前持續招募會員中，亦誠摯懇請善信會員繼續護持，共同成就道場建立，宣揚無極天王弘法濟世之精神，普濟人間。
+              </p>
+            </div>
 
             <div className="form-control">
               <label className="label">
@@ -284,43 +297,33 @@ export default function MembershipRenewPage() {
                   <p className="text-center font-bold">會籍資訊</p>
 
                   <div className="mx-auto w-full max-w-[320px] space-y-2 text-sm text-gray-800">
-                    <div className="flex items-baseline justify-center gap-6">
-                      <div className="flex w-[140px] justify-between">
-                        <span className="font-bold">姓名</span>
-                        <span>：</span>
-                      </div>
+                    <div className="flex items-baseline justify-center gap-2">
+                      <div className="w-[96px] text-right font-bold">姓名</div>
+                      <div className="w-[12px] text-center">：</div>
                       <div className="flex-1 text-left">{memberName ?? "-"}</div>
                     </div>
 
-                    <div className="flex items-baseline justify-center gap-6">
-                      <div className="flex w-[140px] justify-between">
-                        <span className="font-bold">身分證</span>
-                        <span>：</span>
-                      </div>
+                    <div className="flex items-baseline justify-center gap-2">
+                      <div className="w-[96px] text-right font-bold">身分證</div>
+                      <div className="w-[12px] text-center">：</div>
                       <div className="flex-1 text-left">{membership.id_card}</div>
                     </div>
 
-                    <div className="flex items-baseline justify-center gap-6">
-                      <div className="flex w-[140px] justify-between">
-                        <span className="font-bold">生效日</span>
-                        <span>：</span>
-                      </div>
+                    <div className="flex items-baseline justify-center gap-2">
+                      <div className="w-[96px] text-right font-bold">生效日</div>
+                      <div className="w-[12px] text-center">：</div>
                       <div className="flex-1 text-left">{membership.effective_from}</div>
                     </div>
 
-                    <div className="flex items-baseline justify-center gap-6">
-                      <div className="flex w-[140px] justify-between">
-                        <span className="font-bold">到期日</span>
-                        <span>：</span>
-                      </div>
+                    <div className="flex items-baseline justify-center gap-2">
+                      <div className="w-[96px] text-right font-bold">到期日</div>
+                      <div className="w-[12px] text-center">：</div>
                       <div className="flex-1 text-left">{membership.expires_on}</div>
                     </div>
 
-                    <div className="flex items-baseline justify-center gap-6">
-                      <div className="flex w-[140px] justify-between">
-                        <span className="font-bold">下次應繳日</span>
-                        <span>：</span>
-                      </div>
+                    <div className="flex items-baseline justify-center gap-2">
+                      <div className="w-[96px] text-right font-bold">下次應繳日</div>
+                      <div className="w-[12px] text-center">：</div>
                       <div className="flex-1 text-left">{membership.next_due_on}</div>
                     </div>
                   </div>
