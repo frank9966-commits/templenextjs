@@ -1,11 +1,9 @@
 -- 會員續會/提醒功能用資料表
 -- 使用方式：到 Supabase SQL Editor 貼上執行
 
--- participants 是否為會員（參加活動不一定等於入會）
-alter table public.participants
-  add column if not exists is_member boolean not null default false;
-
-create index if not exists idx_participants_is_member on public.participants (is_member);
+-- 說明：參加活動（participants）不等於入會。
+-- 會員資格以 public.memberships（status='active'）為準，
+-- 由管理員在後台建立/啟用會籍資料。
 
 -- updated_at trigger
 create or replace function public.set_updated_at()
@@ -97,56 +95,14 @@ create index if not exists idx_mresp_response on public.membership_renewal_respo
 create index if not exists idx_mresp_responded_at on public.membership_renewal_responses (responded_at desc);
 
 -- =============================
--- 自動帶入：participants -> memberships（規則 B：下月 1 號生效）
+-- （已移除）自動帶入：participants -> memberships
 -- =============================
 
-create or replace function public.ensure_membership_on_participant_insert()
-returns trigger
-language plpgsql
-as $$
-declare
-  eff date;
-  exp date;
-  due date;
-begin
-  -- 參加活動不一定等於入會：只有 is_member=true 才自動建立會籍
-  if coalesce(new.is_member, false) = false then
-    return new;
-  end if;
-
-  -- 規則 B：有效日 = 下個月 1 號
-  eff := (date_trunc('month', now()) + interval '1 month')::date;
-  -- 到期日 = 有效日當月月底
-  exp := (date_trunc('month', eff::timestamptz) + interval '1 month' - interval '1 day')::date;
-  -- 應繳日 = 到期日 + 1 天
-  due := (exp + 1);
-
-  insert into public.memberships (id_card, effective_from, expires_on, next_due_on, cycle_months, status)
-  values (new.id_card, eff, exp, due, 1, 'active')
-  on conflict (id_card) do nothing;
-
-  return new;
-end;
-$$;
-
-drop trigger if exists trg_participants_ensure_membership on public.participants;
-create trigger trg_participants_ensure_membership
-after insert on public.participants
-for each row
-execute function public.ensure_membership_on_participant_insert();
-
--- 回填：把既有 participants 但尚未建立 memberships 的人補齊（規則 B）
-insert into public.memberships (id_card, effective_from, expires_on, next_due_on, cycle_months, status)
-select
-  p.id_card,
-  (date_trunc('month', now()) + interval '1 month')::date as effective_from,
-  (date_trunc('month', (date_trunc('month', now()) + interval '1 month')::date::timestamptz) + interval '1 month' - interval '1 day')::date as expires_on,
-  ((date_trunc('month', (date_trunc('month', now()) + interval '1 month')::date::timestamptz) + interval '1 month' - interval '1 day')::date + 1) as next_due_on,
-  1 as cycle_months,
-  'active'
-from public.participants p
-left join public.memberships m on m.id_card = p.id_card
-where m.id_card is null
-  and p.is_member = true
-  and coalesce(trim(p.id_card), '') <> ''
-on conflict (id_card) do nothing;
+-- 若你想找出「尚未有 active 會籍」的人員（用於後台候選名單），可以用：
+-- select p.id_card, p.name
+-- from public.participants p
+-- left join public.memberships m
+--   on m.id_card = p.id_card
+--  and m.status = 'active'
+-- where m.id is null
+--   and coalesce(trim(p.id_card), '') <> '';
