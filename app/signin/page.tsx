@@ -1,28 +1,17 @@
 "use client";
+
 import { signIn } from "next-auth/react";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function SignIn() {
   const [error, setError] = useState<string | null>(null);
-  const [justSignedIn, setJustSignedIn] = useState(false);
-  const { data: session, status } = useSession();
   const router = useRouter();
-
-  useEffect(() => {
-    if (!justSignedIn) return;
-    if (status !== "authenticated") return;
-
-    if (session?.user?.role === "admin") {
-      router.push("/admin/menu");
-    } else {
-      router.push("/");
-    }
-  }, [justSignedIn, session, status, router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null);
+
     const formData = new FormData(e.currentTarget);
     const res = await signIn("credentials", {
       redirect: false,
@@ -30,20 +19,19 @@ export default function SignIn() {
       password: formData.get("password"),
     });
 
-    // ✅ 這裡處理錯誤
     if (!res?.ok) {
       setError("登入失敗：請檢查身分證或密碼");
       return;
     }
 
-    setJustSignedIn(true);
+    router.push("/");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-base-200">
       <div className="card w-full max-w-sm bg-base-100 shadow-xl">
         <div className="card-body px-6 py-8">
-          <h2 className="text-2xl font-bold text-center">管理員登入</h2>
+          <h2 className="text-2xl font-bold text-center">會員登入</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="form-control">
               <input
@@ -65,7 +53,7 @@ export default function SignIn() {
             <div className="form-control mt-6">
               <button
                 type="submit"
-                className="w-full px-6 py-3 rounded-lg bg-[#FF99E3] text-white text-lg font-bold hover:opacity-90"
+                className="w-full px-6 py-3 rounded-lg bg-[#C299FF] text-white text-lg font-bold hover:opacity-90"
               >
                 登入
               </button>

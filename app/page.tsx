@@ -54,12 +54,18 @@ export default function Home() {
               </a>
               {session?.user?.role === "admin" && (
                 <a
-                  href="/admin"
+                  href="/admin/menu"
                   className="w-full sm:w-auto px-6 py-3 rounded-lg text-white bg-[#67CFCF] hover:opacity-90"
                 >
                   管理後台
                 </a>
               )}
+              <a
+                href="/membership"
+                className="w-full sm:w-auto px-6 py-3 rounded-lg text-white bg-[#C299FF] hover:opacity-90"
+              >
+                會員續會
+              </a>
               {!session && (
                 <a
                   href="/admin/signin"

@@ -1,6 +1,5 @@
 import NextAuth, { NextAuthOptions, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { SupabaseAdapter } from "@next-auth/supabase-adapter";
 import { supabase } from "@/lib/supabaseClient"; // 確保這個路徑正確
 
 // ✅ 允許 `name` 為 `string | null`
@@ -11,6 +10,11 @@ interface CustomUser extends User {
 }
 
 const authOptions: NextAuthOptions = {
+  session: {
+    // 目前專案使用 participants + credentials 登入，不需要 database adapter
+    // 改用 JWT session 可避免 Supabase schema/NextAuth tables 造成的 SESSION_ERROR
+    strategy: "jwt",
+  },
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -48,19 +52,18 @@ const authOptions: NextAuthOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
-  adapter: SupabaseAdapter({
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  }),
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.role = (user as CustomUser).role; // 顯式轉型
+        // 確保 token.sub 有值（供 session.user.id 使用）
+        token.sub = (user as CustomUser).id;
       }
       return token;
     },
     async session({ session, token }) {
-      session.user.role = token.role; // 把 role 放到 session
+      session.user.role = token.role ?? "user"; // 把 role 放到 session
+      session.user.id = token.sub ?? "";
       return session;
     },
   },

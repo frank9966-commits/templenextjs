@@ -36,6 +36,13 @@ export default function AdminMenu() {
             查看捐款狀況
           </button>
 
+          <button
+            onClick={() => router.push("/admin/memberships")}
+            className="w-full px-6 py-3 mb-3 rounded-lg text-white text-lg font-bold bg-[#C299FF] hover:opacity-90"
+          >
+            會員繳費管理
+          </button>
+
         </div>
       </div>
     </div>
