@@ -333,6 +333,15 @@ export default function MembershipJoinPage() {
             </div>
 
             <div className="rounded-lg bg-base-200/50 p-4 text-sm text-gray-800 leading-7">
+              <p>
+                感恩您的善心護持,
+                <br />
+                每一份會費,
+                <br />
+                皆為弘道濟世的一份力量。
+              </p>
+
+              <div className="my-3" />
               <p className="font-bold text-gray-800">◆ 會員繳費方式</p>
               <div className="inline-flex items-center mt-2 px-3 py-1 rounded bg-success/10 text-success font-bold">
                 轉帳
@@ -342,15 +351,6 @@ export default function MembershipJoinPage() {
                 <div>郵局代號：700</div>
                 <div>郵局帳號：0031620-0136581</div>
               </div>
-
-              <div className="my-3" />
-              <p>
-                感恩您的善心護持,
-                <br />
-                每一份會費,
-                <br />
-                皆為弘道濟世的一份力量。
-              </p>
             </div>
 
             <div className="mt-2">
@@ -394,7 +394,7 @@ export default function MembershipJoinPage() {
 
             <button
               type="submit"
-              className="w-full px-6 py-3 rounded-lg text-white bg-[#C299FF] hover:opacity-90 text-lg font-bold disabled:opacity-60"
+              className="w-full px-6 py-3 rounded-lg text-white bg-[#E6A23C] hover:opacity-90 text-lg font-bold disabled:opacity-60"
               disabled={loading}
             >
               {loading ? "送出中..." : "送出首次入會"}
