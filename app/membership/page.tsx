@@ -258,7 +258,7 @@ export default function MembershipRenewPage() {
 
             <div className="text-sm text-gray-700 leading-7">
               <p>
-                無極天王宮道教協會
+                🔸社團法人無極天王宮道教協會🔸
                 <br />
                 感恩各位善信大德與會員長年來的護持與支持，使本協會得以持續為廣大善信服務，弘揚正信道教。
               </p>
