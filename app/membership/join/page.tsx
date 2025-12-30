@@ -333,6 +333,17 @@ export default function MembershipJoinPage() {
             </div>
 
             <div className="rounded-lg bg-base-200/50 p-4 text-sm text-gray-800 leading-7">
+              <p className="font-bold text-gray-800">◆ 會員繳費方式</p>
+              <div className="inline-flex items-center mt-2 px-3 py-1 rounded bg-success/10 text-success font-bold">
+                轉帳
+              </div>
+              <div className="mt-2">
+                <div>戶名：無極天王宮道教協會</div>
+                <div>郵局代號：700</div>
+                <div>郵局帳號：0031620-0136581</div>
+              </div>
+
+              <div className="my-3" />
               <p>
                 感恩您的善心護持,
                 <br />

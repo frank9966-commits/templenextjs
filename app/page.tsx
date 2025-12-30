@@ -41,6 +41,12 @@ export default function Home() {
           <div className="card-body">
             <div className="flex flex-col gap-4 sm:flex-row justify-center text-lg font-bold">
               <a
+                href="/membership"
+                className="w-full sm:w-auto px-6 py-3 rounded-lg text-white bg-[#C299FF] hover:opacity-90"
+              >
+                會員專區
+              </a>
+              <a
                 href="/register"
                 className="w-full sm:w-auto px-6 py-3 rounded-lg text-white bg-[#E6A23C] hover:opacity-90"
               >
@@ -60,12 +66,6 @@ export default function Home() {
                   管理後台
                 </a>
               )}
-              <a
-                href="/membership"
-                className="w-full sm:w-auto px-6 py-3 rounded-lg text-white bg-[#C299FF] hover:opacity-90"
-              >
-                會員專區
-              </a>
               {!session && (
                 <a
                   href="/admin/signin"

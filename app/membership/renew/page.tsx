@@ -361,6 +361,15 @@ export default function MembershipRenewPage() {
                   {!pending && showPayment && (
                     <div className="mt-4 space-y-4">
                       <div>
+                        <p className="text-sm text-gray-800 leading-7">
+                          感恩您的善心護持,
+                          <br />
+                          每一份會費,
+                          <br />
+                          皆為弘道濟世的一份力量。
+                        </p>
+
+                        <div className="my-3" />
                         <p className="font-bold text-gray-800">◆ 會員繳費方式</p>
                         <div className="inline-flex items-center mt-2 px-3 py-1 rounded bg-success/10 text-success font-bold">
                           轉帳
