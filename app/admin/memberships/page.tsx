@@ -67,6 +67,7 @@ export default function AdminMembershipsPage() {
     formatDateOnly(new Date())
   );
   const [expiresOn, setExpiresOn] = useState<DateOnly | null>(null);
+  const [openMarkPaid, setOpenMarkPaid] = useState(true);
   const [openLoading, setOpenLoading] = useState(false);
   const [openMessage, setOpenMessage] = useState<string>("");
 
@@ -198,6 +199,9 @@ export default function AdminMembershipsPage() {
     return map;
   }, [memberships]);
 
+  const computePeriodEndFromCycle = (start: DateOnly, months: number) =>
+    endOfMonth(addMonths(start, months - 1));
+
   const cycleLabel = (months: number) =>
     months === 12 ? "年繳" : months === 6 ? "半年繳" : months === 3 ? "季繳" : "月繳";
 
@@ -297,6 +301,23 @@ export default function AdminMembershipsPage() {
     await refresh();
   };
 
+  const markInitialPaid = async (membershipId: number, paid: boolean) => {
+    setError("");
+    const { error: updErr } = await supabase
+      .from("memberships")
+      .update({
+        last_paid_confirmed_at: paid ? new Date().toISOString() : null,
+        ...(paid ? { status: "active" as const } : {}),
+      })
+      .eq("id", membershipId);
+
+    if (updErr) {
+      setError(updErr.message);
+      return;
+    }
+    await refresh();
+  };
+
   const handleOpenMembership = async () => {
     setError("");
     setOpenMessage("");
@@ -332,6 +353,7 @@ export default function AdminMembershipsPage() {
       if (exErr) throw exErr;
       const finalExpiresOn = expiresOn ?? endOfMonth(effectiveFrom);
       const nextDueOn = addDays(finalExpiresOn, 1);
+      const lastPaid = openMarkPaid ? new Date().toISOString() : null;
 
       if (existing) {
         const { error: updErr } = await supabase
@@ -342,6 +364,7 @@ export default function AdminMembershipsPage() {
             next_due_on: nextDueOn,
             cycle_months: 1,
             status: "active",
+            last_paid_confirmed_at: lastPaid,
           })
           .eq("id", (existing as { id: number }).id);
 
@@ -355,6 +378,7 @@ export default function AdminMembershipsPage() {
           next_due_on: nextDueOn,
           cycle_months: 1,
           status: "active",
+          last_paid_confirmed_at: lastPaid,
         });
 
         if (insErr) throw insErr;
@@ -362,6 +386,7 @@ export default function AdminMembershipsPage() {
       }
       setSelectedIdCard("");
       setExpiresOn(null);
+      setOpenMarkPaid(true);
       await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "開通失敗");
@@ -396,7 +421,9 @@ export default function AdminMembershipsPage() {
           : latest.admin_status === "unpaid"
             ? "未繳費"
             : "待審核"
-        : "-";
+        : m.last_paid_confirmed_at
+          ? "已確認收款"
+          : "-";
       const cycleText = cycleLabel(m.cycle_months ?? 1);
       const periodText = latest ? `${latest.period_start}~${latest.period_end}` : "-";
       const lastPaid = m.last_paid_confirmed_at
@@ -480,6 +507,21 @@ export default function AdminMembershipsPage() {
                     setExpiresOn((e.target.value || null) as DateOnly | null)
                   }
                 />
+              </div>
+
+              <div className="form-control lg:w-56">
+                <label className="label">
+                  <span className="label-text">收款</span>
+                </label>
+                <label className="label cursor-pointer justify-start gap-3">
+                  <input
+                    type="checkbox"
+                    className="checkbox"
+                    checked={openMarkPaid}
+                    onChange={(e) => setOpenMarkPaid(e.target.checked)}
+                  />
+                  <span className="label-text">同時標記已確認收款</span>
+                </label>
               </div>
 
               <button
@@ -650,7 +692,9 @@ export default function AdminMembershipsPage() {
                           : latest.admin_status === "unpaid"
                             ? "未繳費"
                             : "待審核"
-                        : "-";
+                        : m.last_paid_confirmed_at
+                          ? "已確認收款"
+                          : "-";
 
                       const cycleText = latest ? cycleLabel(latest.cycle_months) : "";
                       return (
@@ -697,9 +741,30 @@ export default function AdminMembershipsPage() {
                                 className="select select-bordered select-sm"
                                 value={m.cycle_months ?? 1}
                                 onChange={(e) =>
-                                  void updateMembership(m.id, {
-                                    cycle_months: Number(e.target.value),
-                                  })
+                                  void (async () => {
+                                    const newCycleMonths = Number(e.target.value);
+                                    const latest = latestRenewalByMembershipId[m.id];
+
+                                    // 若尚無任何續費申請（多為首次入會），改預設繳費方式時同步重算會籍期間
+                                    if (!latest) {
+                                      const newExpiresOn = computePeriodEndFromCycle(
+                                        m.effective_from,
+                                        newCycleMonths
+                                      );
+                                      const newNextDueOn = addDays(newExpiresOn, 1);
+                                      await updateMembership(m.id, {
+                                        cycle_months: newCycleMonths,
+                                        expires_on: newExpiresOn,
+                                        next_due_on: newNextDueOn,
+                                      });
+                                      return;
+                                    }
+
+                                    // 有續費申請時，這裡僅調整預設繳費方式，不主動改動現有到期日
+                                    await updateMembership(m.id, {
+                                      cycle_months: newCycleMonths,
+                                    });
+                                  })()
                                 }
                               >
                                 <option value={1}>月繳</option>
@@ -724,7 +789,24 @@ export default function AdminMembershipsPage() {
                                   </button>
                                 </div>
                               ) : (
-                                <span className="text-xs text-gray-500">無續會申請（僅設定預設繳費方式）</span>
+                                <div className="flex flex-col gap-2">
+                                  <span className="text-xs text-gray-500">尚無續費申請（首次入會通常不會有）</span>
+                                  {m.last_paid_confirmed_at ? (
+                                    <button
+                                      className="btn btn-xs btn-outline"
+                                      onClick={() => void markInitialPaid(m.id, false)}
+                                    >
+                                      取消收款標記
+                                    </button>
+                                  ) : (
+                                    <button
+                                      className="btn btn-xs btn-success"
+                                      onClick={() => void markInitialPaid(m.id, true)}
+                                    >
+                                      標記首次入會已收款
+                                    </button>
+                                  )}
+                                </div>
                               )}
                             </div>
                           </td>

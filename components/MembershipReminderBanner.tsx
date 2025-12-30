@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import {
-  computeNextRenewal,
   isReminderNeeded,
   type DateOnly,
 } from "@/lib/membership";
@@ -34,7 +34,6 @@ export default function MembershipReminderBanner() {
 
   const [membership, setMembership] = useState<MembershipRow | null>(null);
   const [latestRenewal, setLatestRenewal] = useState<RenewalRow | null>(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const shouldShow = useMemo(() => {
@@ -93,53 +92,6 @@ export default function MembershipReminderBanner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldShow, idCard]);
 
-  const handleRenew = async () => {
-    if (!membership) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const { periodStart, periodEnd, newExpiresOn, newNextDueOn } = computeNextRenewal({
-        expiresOn: membership.expires_on,
-        nextDueOn: membership.next_due_on,
-      });
-
-      // 先建立/更新續會申請（避免重複點）
-      const { error: upsertErr } = await supabase
-        .from("membership_renewal_requests")
-        .upsert(
-          {
-            membership_id: membership.id,
-            period_start: periodStart,
-            period_end: periodEnd,
-            admin_status: "pending",
-          },
-          { onConflict: "membership_id,period_start" }
-        );
-
-      if (upsertErr) throw upsertErr;
-
-      const { error: updErr } = await supabase
-        .from("memberships")
-        .update({
-          expires_on: newExpiresOn,
-          next_due_on: newNextDueOn,
-          last_renew_requested_at: new Date().toISOString(),
-          status: "active",
-        })
-        .eq("id", membership.id);
-
-      if (updErr) throw updErr;
-
-      await refresh();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "續會失敗");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (!shouldShow) return null;
   if (error) {
     return (
@@ -176,13 +128,12 @@ export default function MembershipReminderBanner() {
             </div>
 
             {!pending && (
-              <button
-                className="px-5 py-3 rounded-lg text-white bg-[#C299FF] hover:opacity-90 text-base font-bold disabled:opacity-60"
-                onClick={handleRenew}
-                disabled={loading}
+              <Link
+                href="/membership"
+                className="px-5 py-3 rounded-lg text-white bg-[#C299FF] hover:opacity-90 text-base font-bold"
               >
-                {loading ? "處理中..." : "立即續會"}
-              </button>
+                會員專區
+              </Link>
             )}
           </div>
         </div>

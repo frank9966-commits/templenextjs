@@ -64,7 +64,7 @@ export default function Home() {
                 href="/membership"
                 className="w-full sm:w-auto px-6 py-3 rounded-lg text-white bg-[#C299FF] hover:opacity-90"
               >
-                會員續會
+                會員專區
               </a>
               {!session && (
                 <a
