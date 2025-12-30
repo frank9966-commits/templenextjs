@@ -195,6 +195,19 @@ export default function MembershipJoinPage() {
               </p>
             </div>
 
+            <div className="rounded-lg bg-base-200/50 p-4 text-sm text-gray-800 leading-7">
+              <p className="font-bold mb-2">會員入會說明</p>
+              <p>新入會員需繳交:</p>
+              <p>・入會費:新台幣1,000元</p>
+              <p className="mt-2">會費說明:</p>
+              <p>會費一年為新台幣6,000元</p>
+              <p>可依需求選擇以下方式繳納:</p>
+              <p>・年繳：6,000元</p>
+              <p>・半年繳：3,000元</p>
+              <p>・季繳：1,500元</p>
+              <p>・月繳：500元</p>
+            </div>
+
             <div className="form-control">
               <label className="label">
                 <span className="label-text">身分證</span>
@@ -320,16 +333,13 @@ export default function MembershipJoinPage() {
             </div>
 
             <div className="rounded-lg bg-base-200/50 p-4 text-sm text-gray-800 leading-7">
-              <p className="font-bold mb-2">會員入會說明</p>
-              <p>新入會員需繳交:</p>
-              <p>・入會費:新台幣1,000元</p>
-              <p className="mt-2">會費說明:</p>
-              <p>會費一年為新台幣6,000元</p>
-              <p>可依需求選擇以下方式繳納:</p>
-              <p>・年繳：6,000元</p>
-              <p>・半年繳：3,000元</p>
-              <p>・季繳：1,500元</p>
-              <p>・月繳：500元</p>
+              <p>
+                感恩您的善心護持,
+                <br />
+                每一份會費,
+                <br />
+                皆為弘道濟世的一份力量。
+              </p>
             </div>
 
             <div className="mt-2">
