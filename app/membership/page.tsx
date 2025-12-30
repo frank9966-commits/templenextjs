@@ -280,18 +280,50 @@ export default function MembershipRenewPage() {
 
             {checked && membership && (
               <div className="card bg-base-200/60 shadow-inner">
-                <div className="card-body space-y-2">
+                <div className="card-body space-y-3">
                   <p className="text-center font-bold">會籍資訊</p>
-                  <p className="text-sm text-center text-gray-700">
-                    姓名：{memberName ?? "-"}｜身分證：{membership.id_card}
-                  </p>
-                  <p className="text-sm text-center text-gray-700">
-                    生效日：{membership.effective_from}｜到期日：{membership.expires_on}
-                  </p>
-                  <p className="text-sm text-center text-gray-700">
-                    下次應繳日：{membership.next_due_on}
-                    {needReminder ? "（需要提醒）" : ""}
-                  </p>
+
+                  <div className="mx-auto w-full max-w-[320px] space-y-2 text-sm text-gray-800">
+                    <div className="flex items-baseline justify-center gap-6">
+                      <div className="flex w-[140px] justify-between">
+                        <span className="font-bold">姓名</span>
+                        <span>：</span>
+                      </div>
+                      <div className="flex-1 text-left">{memberName ?? "-"}</div>
+                    </div>
+
+                    <div className="flex items-baseline justify-center gap-6">
+                      <div className="flex w-[140px] justify-between">
+                        <span className="font-bold">身分證</span>
+                        <span>：</span>
+                      </div>
+                      <div className="flex-1 text-left">{membership.id_card}</div>
+                    </div>
+
+                    <div className="flex items-baseline justify-center gap-6">
+                      <div className="flex w-[140px] justify-between">
+                        <span className="font-bold">生效日</span>
+                        <span>：</span>
+                      </div>
+                      <div className="flex-1 text-left">{membership.effective_from}</div>
+                    </div>
+
+                    <div className="flex items-baseline justify-center gap-6">
+                      <div className="flex w-[140px] justify-between">
+                        <span className="font-bold">到期日</span>
+                        <span>：</span>
+                      </div>
+                      <div className="flex-1 text-left">{membership.expires_on}</div>
+                    </div>
+
+                    <div className="flex items-baseline justify-center gap-6">
+                      <div className="flex w-[140px] justify-between">
+                        <span className="font-bold">下次應繳日</span>
+                        <span>：</span>
+                      </div>
+                      <div className="flex-1 text-left">{membership.next_due_on}</div>
+                    </div>
+                  </div>
 
                   {pending ? (
                     <div className="text-center font-bold text-gray-800">已送出續會申請，待管理員確認。</div>
@@ -301,14 +333,14 @@ export default function MembershipRenewPage() {
                       <div className="flex justify-center gap-4">
                         <button
                           onClick={() => void handleRenewYes()}
-                          className="px-8 py-3 rounded-lg text-white bg-[#32C8C2] hover:opacity-90 text-lg font-bold disabled:opacity-60"
+                          className="flex-1 max-w-[140px] px-8 py-3 rounded-lg text-white bg-[#32C8C2] hover:opacity-90 text-lg font-bold disabled:opacity-60"
                           disabled={loading}
                         >
                           是
                         </button>
                         <button
                           onClick={() => void handleRenewNo()}
-                          className="px-8 py-3 rounded-lg text-white bg-[#E65C52] hover:opacity-90 text-lg font-bold"
+                          className="flex-1 max-w-[140px] px-8 py-3 rounded-lg text-white bg-[#E65C52] hover:opacity-90 text-lg font-bold"
                         >
                           否
                         </button>
