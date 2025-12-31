@@ -449,11 +449,13 @@ export default function AdminMembershipsPage() {
   return (
     <div className="min-h-screen bg-base-200 p-4">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold">會員繳費管理</h1>
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+          <h1 className="text-2xl font-bold text-center sm:text-left w-full sm:w-auto">
+            會員繳費管理
+          </h1>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
             <ExportMembershipExcel data={exportRows} filename="會籍清單.xlsx" />
-            <button className="btn btn-sm" onClick={() => void refresh()}>
+            <button className="btn btn-sm w-full sm:w-auto" onClick={() => void refresh()}>
               重新整理
             </button>
           </div>
@@ -553,68 +555,137 @@ export default function AdminMembershipsPage() {
             ) : pendingRenewals.length === 0 ? (
               <p className="text-gray-500">目前沒有待審核申請。</p>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>姓名</th>
-                      <th>身分證</th>
-                      <th>期間</th>
-                      <th>繳費</th>
-                      <th>申請時間</th>
-                      <th>操作</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pendingRenewals.map((r) => {
-                      const m = membershipById.get(r.membership_id);
-                      const idCard = m?.id_card ?? "";
-                      const name = idCard ? nameByIdCard[idCard] ?? "-" : "-";
+              <>
+                {/* Mobile cards */}
+                <div className="sm:hidden space-y-3">
+                  {pendingRenewals.map((r) => {
+                    const m = membershipById.get(r.membership_id);
+                    const idCard = m?.id_card ?? "";
+                    const name = idCard ? nameByIdCard[idCard] ?? "-" : "-";
 
-                      return (
-                        <tr key={r.id}>
-                          <td>{name}</td>
-                          <td>{idCard || "-"}</td>
-                          <td>
+                    return (
+                      <div key={r.id} className="rounded-lg border border-base-300 bg-base-100 p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="font-bold text-base">{name}</div>
+                            <div className="text-xs text-gray-500 mt-1">{idCard || "-"}</div>
+                          </div>
+                          <div className="text-xs text-gray-500 text-right">
+                            申請時間
+                            <div>{new Date(r.requested_at).toLocaleString()}</div>
+                          </div>
+                        </div>
+
+                        <div className="mt-3 text-sm">
+                          <div className="text-gray-500">期間</div>
+                          <div>
                             {r.period_start} ~ {r.period_end}
-                          </td>
-                          <td>
-                            <select
-                              className="select select-bordered select-sm"
-                              value={r.cycle_months}
-                              onChange={(e) =>
-                                void updateRenewal(r.id, {
-                                  cycle_months: Number(e.target.value),
-                                })
-                              }
-                            >
-                              <option value={1}>月繳</option>
-                              <option value={3}>季繳</option>
-                              <option value={6}>半年繳</option>
-                              <option value={12}>年繳</option>
-                            </select>
-                          </td>
-                          <td>{new Date(r.requested_at).toLocaleString()}</td>
-                          <td className="flex gap-2">
-                            <button
-                              className="btn btn-sm btn-success"
-                              onClick={() => void markRenewal(r.id, "paid")}
-                            >
-                              已續費
-                            </button>
-                            <button
-                              className="btn btn-sm btn-error"
-                              onClick={() => void markRenewal(r.id, "unpaid")}
-                            >
-                              未續費
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-3">
+                          <div className="text-sm text-gray-500 mb-1">繳費方式</div>
+                          <select
+                            className="select select-bordered w-full"
+                            value={r.cycle_months}
+                            onChange={(e) =>
+                              void updateRenewal(r.id, {
+                                cycle_months: Number(e.target.value),
+                              })
+                            }
+                          >
+                            <option value={1}>月繳</option>
+                            <option value={3}>季繳</option>
+                            <option value={6}>半年繳</option>
+                            <option value={12}>年繳</option>
+                          </select>
+                        </div>
+
+                        <div className="mt-4 grid grid-cols-2 gap-2">
+                          <button
+                            className="btn btn-success w-full"
+                            onClick={() => void markRenewal(r.id, "paid")}
+                          >
+                            已續費
+                          </button>
+                          <button
+                            className="btn btn-error w-full"
+                            onClick={() => void markRenewal(r.id, "unpaid")}
+                          >
+                            未續費
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Desktop table */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>姓名</th>
+                        <th>身分證</th>
+                        <th>期間</th>
+                        <th>繳費</th>
+                        <th>申請時間</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pendingRenewals.map((r) => {
+                        const m = membershipById.get(r.membership_id);
+                        const idCard = m?.id_card ?? "";
+                        const name = idCard ? nameByIdCard[idCard] ?? "-" : "-";
+
+                        return (
+                          <tr key={r.id}>
+                            <td>{name}</td>
+                            <td>{idCard || "-"}</td>
+                            <td>
+                              {r.period_start} ~ {r.period_end}
+                            </td>
+                            <td>
+                              <select
+                                className="select select-bordered select-sm"
+                                value={r.cycle_months}
+                                onChange={(e) =>
+                                  void updateRenewal(r.id, {
+                                    cycle_months: Number(e.target.value),
+                                  })
+                                }
+                              >
+                                <option value={1}>月繳</option>
+                                <option value={3}>季繳</option>
+                                <option value={6}>半年繳</option>
+                                <option value={12}>年繳</option>
+                              </select>
+                            </td>
+                            <td>{new Date(r.requested_at).toLocaleString()}</td>
+                            <td>
+                              <div className="flex gap-2">
+                                <button
+                                  className="btn btn-sm btn-success"
+                                  onClick={() => void markRenewal(r.id, "paid")}
+                                >
+                                  已續費
+                                </button>
+                                <button
+                                  className="btn btn-sm btn-error"
+                                  onClick={() => void markRenewal(r.id, "unpaid")}
+                                >
+                                  未續費
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -627,33 +698,58 @@ export default function AdminMembershipsPage() {
             ) : declinedResponses.length === 0 ? (
               <p className="text-gray-500">目前沒有回覆不續費的紀錄。</p>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>姓名</th>
-                      <th>身分證</th>
-                      <th>本期起算日</th>
-                      <th>回覆時間</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {declinedResponses.map((r) => {
-                      const m = membershipById.get(r.membership_id);
-                      const idCard = m?.id_card ?? "";
-                      const name = idCard ? nameByIdCard[idCard] ?? "-" : "-";
-                      return (
-                        <tr key={r.id}>
-                          <td>{name}</td>
-                          <td>{idCard || "-"}</td>
-                          <td>{r.period_start}</td>
-                          <td>{new Date(r.responded_at).toLocaleString()}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <>
+                {/* Mobile cards */}
+                <div className="sm:hidden space-y-3">
+                  {declinedResponses.map((r) => {
+                    const m = membershipById.get(r.membership_id);
+                    const idCard = m?.id_card ?? "";
+                    const name = idCard ? nameByIdCard[idCard] ?? "-" : "-";
+                    return (
+                      <div key={r.id} className="rounded-lg border border-base-300 bg-base-100 p-4">
+                        <div className="font-bold text-base">{name}</div>
+                        <div className="text-xs text-gray-500 mt-1">{idCard || "-"}</div>
+                        <div className="mt-3 text-sm">
+                          <div className="text-gray-500">本期起算日</div>
+                          <div>{r.period_start}</div>
+                        </div>
+                        <div className="mt-3 text-xs text-gray-500">
+                          回覆時間：{new Date(r.responded_at).toLocaleString()}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Desktop table */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>姓名</th>
+                        <th>身分證</th>
+                        <th>本期起算日</th>
+                        <th>回覆時間</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {declinedResponses.map((r) => {
+                        const m = membershipById.get(r.membership_id);
+                        const idCard = m?.id_card ?? "";
+                        const name = idCard ? nameByIdCard[idCard] ?? "-" : "-";
+                        return (
+                          <tr key={r.id}>
+                            <td>{name}</td>
+                            <td>{idCard || "-"}</td>
+                            <td>{r.period_start}</td>
+                            <td>{new Date(r.responded_at).toLocaleString()}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -666,156 +762,334 @@ export default function AdminMembershipsPage() {
             ) : memberships.length === 0 ? (
               <p className="text-gray-500">目前沒有會籍資料。</p>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>提醒</th>
-                      <th>繳費狀態</th>
-                      <th>狀態</th>
-                      <th>姓名</th>
-                      <th>身分證</th>
-                      <th>生效日</th>
-                      <th>到期日</th>
-                      <th>應繳日</th>
-                      <th>提醒起算日</th>
-                      <th>調整</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {reminderRows.map((m) => {
-                      const name = nameByIdCard[m.id_card] ?? "-";
-                      const latest = latestRenewalByMembershipId[m.id];
-                      const paymentStatus = latest
-                        ? latest.admin_status === "paid"
-                          ? "已繳費"
-                          : latest.admin_status === "unpaid"
-                            ? "未繳費"
-                            : "待審核"
-                        : m.last_paid_confirmed_at
-                          ? "已確認收款"
-                          : "-";
+              <>
+                {/* Mobile cards */}
+                <div className="sm:hidden space-y-3">
+                  {reminderRows.map((m) => {
+                    const name = nameByIdCard[m.id_card] ?? "-";
+                    const latest = latestRenewalByMembershipId[m.id];
+                    const paymentStatus = latest
+                      ? latest.admin_status === "paid"
+                        ? "已繳費"
+                        : latest.admin_status === "unpaid"
+                          ? "未繳費"
+                          : "待審核"
+                      : m.last_paid_confirmed_at
+                        ? "已確認收款"
+                        : "-";
 
-                      const cycleText = latest ? cycleLabel(latest.cycle_months) : "";
-                      return (
-                        <tr key={m.id} className={m.needReminder ? "bg-warning/10" : ""}>
-                          <td>{m.needReminder ? "需要" : "-"}</td>
-                          <td>
+                    const cycleText = latest ? cycleLabel(latest.cycle_months) : "";
+
+                    return (
+                      <div
+                        key={m.id}
+                        className={
+                          "rounded-lg border border-base-300 bg-base-100 p-4" +
+                          (m.needReminder ? " bg-warning/10" : "")
+                        }
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="font-bold text-base">{name}</div>
+                            <div className="text-xs text-gray-500 mt-1">{m.id_card}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-xs text-gray-500">繳費狀態</div>
                             <div className="font-bold">{paymentStatus}</div>
-                            {latest && (
-                              <div className="text-xs text-gray-500">
+                            {latest ? (
+                              <div className="text-xs text-gray-500 mt-1">
                                 {cycleText}｜{latest.period_start}~{latest.period_end}
                               </div>
-                            )}
-                          </td>
-                          <td>
-                            <div className="flex flex-col gap-1">
-                              <div className="text-sm font-bold">
-                                {m.status === "active" ? "啟用" : "停用"}
-                              </div>
+                            ) : null}
+                          </div>
+                        </div>
+
+                        <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                          <div>
+                            <div className="text-gray-500">狀態</div>
+                            <div className="font-bold">{m.status === "active" ? "啟用" : "停用"}</div>
+                          </div>
+                          <div>
+                            <div className="text-gray-500">提醒</div>
+                            <div className="font-bold">{m.needReminder ? "需要" : "-"}</div>
+                          </div>
+                        </div>
+
+                        <div className="mt-3 space-y-2 text-sm">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-gray-500">生效日</span>
+                            <span>{m.effective_from}</span>
+                          </div>
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-gray-500">到期日</span>
+                            <span>{m.expires_on}</span>
+                          </div>
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-gray-500">應繳日</span>
+                            <span>{m.next_due_on}</span>
+                          </div>
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-gray-500">提醒起算日</span>
+                            <span>{m.remindFrom}</span>
+                          </div>
+                        </div>
+
+                        <div className="mt-4">
+                          <button
+                            className={
+                              m.status === "active"
+                                ? "btn btn-outline w-full"
+                                : "btn btn-primary w-full"
+                            }
+                            onClick={() =>
+                              void updateMembership(m.id, {
+                                status: m.status === "active" ? "inactive" : "active",
+                              })
+                            }
+                          >
+                            {m.status === "active" ? "停用" : "恢復"}
+                          </button>
+                        </div>
+
+                        <div className="mt-4">
+                          <div className="text-sm text-gray-500 mb-1">預設繳費方式</div>
+                          <select
+                            className="select select-bordered w-full"
+                            value={m.cycle_months ?? 1}
+                            onChange={(e) =>
+                              void (async () => {
+                                const newCycleMonths = Number(e.target.value);
+                                const latest = latestRenewalByMembershipId[m.id];
+
+                                // 若尚無任何續費申請（多為首次入會），改預設繳費方式時同步重算會籍期間
+                                if (!latest) {
+                                  const newExpiresOn = computePeriodEndFromCycle(
+                                    m.effective_from,
+                                    newCycleMonths
+                                  );
+                                  const newNextDueOn = addDays(newExpiresOn, 1);
+                                  await updateMembership(m.id, {
+                                    cycle_months: newCycleMonths,
+                                    expires_on: newExpiresOn,
+                                    next_due_on: newNextDueOn,
+                                  });
+                                  return;
+                                }
+
+                                // 有續費申請時，這裡僅調整預設繳費方式，不主動改動現有到期日
+                                await updateMembership(m.id, {
+                                  cycle_months: newCycleMonths,
+                                });
+                              })()
+                            }
+                          >
+                            <option value={1}>月繳</option>
+                            <option value={3}>季繳</option>
+                            <option value={6}>半年繳</option>
+                            <option value={12}>年繳</option>
+                          </select>
+                        </div>
+
+                        <div className="mt-4">
+                          {latest ? (
+                            <div className="grid grid-cols-2 gap-2">
                               <button
-                                className={
-                                  m.status === "active"
-                                    ? "btn btn-xs btn-outline"
-                                    : "btn btn-xs btn-primary"
-                                }
-                                onClick={() =>
-                                  void updateMembership(m.id, {
-                                    status: m.status === "active" ? "inactive" : "active",
-                                  })
-                                }
+                                className="btn btn-success w-full"
+                                onClick={() => void updateRenewal(latest.id, { admin_status: "paid" })}
                               >
-                                {m.status === "active" ? "停用" : "恢復"}
+                                已繳費
+                              </button>
+                              <button
+                                className="btn btn-error w-full"
+                                onClick={() => void updateRenewal(latest.id, { admin_status: "unpaid" })}
+                              >
+                                未繳費
                               </button>
                             </div>
-                          </td>
-                          <td>{name}</td>
-                          <td>{m.id_card}</td>
-                          <td>{m.effective_from}</td>
-                          <td>{m.expires_on}</td>
-                          <td>{m.next_due_on}</td>
-                          <td>{m.remindFrom}</td>
-                          <td className="min-w-[220px]">
-                            <div className="flex flex-col gap-2">
-                              <select
-                                className="select select-bordered select-sm"
-                                value={m.cycle_months ?? 1}
-                                onChange={(e) =>
-                                  void (async () => {
-                                    const newCycleMonths = Number(e.target.value);
-                                    const latest = latestRenewalByMembershipId[m.id];
-
-                                    // 若尚無任何續費申請（多為首次入會），改預設繳費方式時同步重算會籍期間
-                                    if (!latest) {
-                                      const newExpiresOn = computePeriodEndFromCycle(
-                                        m.effective_from,
-                                        newCycleMonths
-                                      );
-                                      const newNextDueOn = addDays(newExpiresOn, 1);
-                                      await updateMembership(m.id, {
-                                        cycle_months: newCycleMonths,
-                                        expires_on: newExpiresOn,
-                                        next_due_on: newNextDueOn,
-                                      });
-                                      return;
-                                    }
-
-                                    // 有續費申請時，這裡僅調整預設繳費方式，不主動改動現有到期日
-                                    await updateMembership(m.id, {
-                                      cycle_months: newCycleMonths,
-                                    });
-                                  })()
-                                }
-                              >
-                                <option value={1}>月繳</option>
-                                <option value={3}>季繳</option>
-                                <option value={6}>半年繳</option>
-                                <option value={12}>年繳</option>
-                              </select>
-
-                              {latest ? (
-                                <div className="flex gap-2">
-                                  <button
-                                    className="btn btn-xs btn-success"
-                                    onClick={() => void updateRenewal(latest.id, { admin_status: "paid" })}
-                                  >
-                                    已繳費
-                                  </button>
-                                  <button
-                                    className="btn btn-xs btn-error"
-                                    onClick={() => void updateRenewal(latest.id, { admin_status: "unpaid" })}
-                                  >
-                                    未繳費
-                                  </button>
-                                </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <div className="text-xs text-gray-500">尚無續費申請（首次入會通常不會有）</div>
+                              {m.last_paid_confirmed_at ? (
+                                <button
+                                  className="btn btn-outline w-full"
+                                  onClick={() => void markInitialPaid(m.id, false)}
+                                >
+                                  取消收款標記
+                                </button>
                               ) : (
-                                <div className="flex flex-col gap-2">
-                                  <span className="text-xs text-gray-500">尚無續費申請（首次入會通常不會有）</span>
-                                  {m.last_paid_confirmed_at ? (
-                                    <button
-                                      className="btn btn-xs btn-outline"
-                                      onClick={() => void markInitialPaid(m.id, false)}
-                                    >
-                                      取消收款標記
-                                    </button>
-                                  ) : (
-                                    <button
-                                      className="btn btn-xs btn-success"
-                                      onClick={() => void markInitialPaid(m.id, true)}
-                                    >
-                                      標記首次入會已收款
-                                    </button>
-                                  )}
-                                </div>
+                                <button
+                                  className="btn btn-success w-full"
+                                  onClick={() => void markInitialPaid(m.id, true)}
+                                >
+                                  標記首次入會已收款
+                                </button>
                               )}
                             </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Desktop table */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>提醒</th>
+                        <th>繳費狀態</th>
+                        <th>狀態</th>
+                        <th>姓名</th>
+                        <th>身分證</th>
+                        <th>生效日</th>
+                        <th>到期日</th>
+                        <th>應繳日</th>
+                        <th>提醒起算日</th>
+                        <th>調整</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {reminderRows.map((m) => {
+                        const name = nameByIdCard[m.id_card] ?? "-";
+                        const latest = latestRenewalByMembershipId[m.id];
+                        const paymentStatus = latest
+                          ? latest.admin_status === "paid"
+                            ? "已繳費"
+                            : latest.admin_status === "unpaid"
+                              ? "未繳費"
+                              : "待審核"
+                          : m.last_paid_confirmed_at
+                            ? "已確認收款"
+                            : "-";
+
+                        const cycleText = latest ? cycleLabel(latest.cycle_months) : "";
+                        return (
+                          <tr key={m.id} className={m.needReminder ? "bg-warning/10" : ""}>
+                            <td>{m.needReminder ? "需要" : "-"}</td>
+                            <td>
+                              <div className="font-bold">{paymentStatus}</div>
+                              {latest && (
+                                <div className="text-xs text-gray-500">
+                                  {cycleText}｜{latest.period_start}~{latest.period_end}
+                                </div>
+                              )}
+                            </td>
+                            <td>
+                              <div className="flex flex-col gap-1">
+                                <div className="text-sm font-bold">
+                                  {m.status === "active" ? "啟用" : "停用"}
+                                </div>
+                                <button
+                                  className={
+                                    m.status === "active"
+                                      ? "btn btn-xs btn-outline"
+                                      : "btn btn-xs btn-primary"
+                                  }
+                                  onClick={() =>
+                                    void updateMembership(m.id, {
+                                      status: m.status === "active" ? "inactive" : "active",
+                                    })
+                                  }
+                                >
+                                  {m.status === "active" ? "停用" : "恢復"}
+                                </button>
+                              </div>
+                            </td>
+                            <td>{name}</td>
+                            <td>{m.id_card}</td>
+                            <td>{m.effective_from}</td>
+                            <td>{m.expires_on}</td>
+                            <td>{m.next_due_on}</td>
+                            <td>{m.remindFrom}</td>
+                            <td className="min-w-[220px]">
+                              <div className="flex flex-col gap-2">
+                                <select
+                                  className="select select-bordered select-sm"
+                                  value={m.cycle_months ?? 1}
+                                  onChange={(e) =>
+                                    void (async () => {
+                                      const newCycleMonths = Number(e.target.value);
+                                      const latest = latestRenewalByMembershipId[m.id];
+
+                                      // 若尚無任何續費申請（多為首次入會），改預設繳費方式時同步重算會籍期間
+                                      if (!latest) {
+                                        const newExpiresOn = computePeriodEndFromCycle(
+                                          m.effective_from,
+                                          newCycleMonths
+                                        );
+                                        const newNextDueOn = addDays(newExpiresOn, 1);
+                                        await updateMembership(m.id, {
+                                          cycle_months: newCycleMonths,
+                                          expires_on: newExpiresOn,
+                                          next_due_on: newNextDueOn,
+                                        });
+                                        return;
+                                      }
+
+                                      // 有續費申請時，這裡僅調整預設繳費方式，不主動改動現有到期日
+                                      await updateMembership(m.id, {
+                                        cycle_months: newCycleMonths,
+                                      });
+                                    })()
+                                  }
+                                >
+                                  <option value={1}>月繳</option>
+                                  <option value={3}>季繳</option>
+                                  <option value={6}>半年繳</option>
+                                  <option value={12}>年繳</option>
+                                </select>
+
+                                {latest ? (
+                                  <div className="flex gap-2">
+                                    <button
+                                      className="btn btn-xs btn-success"
+                                      onClick={() =>
+                                        void updateRenewal(latest.id, { admin_status: "paid" })
+                                      }
+                                    >
+                                      已繳費
+                                    </button>
+                                    <button
+                                      className="btn btn-xs btn-error"
+                                      onClick={() =>
+                                        void updateRenewal(latest.id, { admin_status: "unpaid" })
+                                      }
+                                    >
+                                      未繳費
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="flex flex-col gap-2">
+                                    <span className="text-xs text-gray-500">
+                                      尚無續費申請（首次入會通常不會有）
+                                    </span>
+                                    {m.last_paid_confirmed_at ? (
+                                      <button
+                                        className="btn btn-xs btn-outline"
+                                        onClick={() => void markInitialPaid(m.id, false)}
+                                      >
+                                        取消收款標記
+                                      </button>
+                                    ) : (
+                                      <button
+                                        className="btn btn-xs btn-success"
+                                        onClick={() => void markInitialPaid(m.id, true)}
+                                      >
+                                        標記首次入會已收款
+                                      </button>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
         </div>
