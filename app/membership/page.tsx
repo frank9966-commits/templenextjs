@@ -24,7 +24,7 @@ export default function MembershipAreaPage() {
             </div>
 
             <p className="text-xs text-gray-500 text-center">
-              首次入會會寫入基本資料至 participants，會籍由管理員後台開通。
+              入會流程說明： 填寫資料 → 提交申請 → 管理員人工審核 → 開通正式會籍。
             </p>
           </div>
         </div>

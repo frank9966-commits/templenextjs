@@ -12,8 +12,14 @@ export default function MembershipJoinPage() {
   const [zodiacSign, setZodiacSign] = useState("");
   const [cycleMonths, setCycleMonths] = useState<number | null>(null);
 
-  const [idCardExistingName, setIdCardExistingName] = useState<string | null>(null);
-  const [checkingIdCard, setCheckingIdCard] = useState(false);
+  const [existingMembership, setExistingMembership] = useState<
+    | {
+        status: "active" | "inactive" | string;
+        expires_on?: string | null;
+      }
+    | null
+  >(null);
+  const [checkingMembership, setCheckingMembership] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,39 +60,51 @@ export default function MembershipJoinPage() {
   useEffect(() => {
     const value = normalizedIdCard;
     if (!value) {
-      setIdCardExistingName(null);
-      setCheckingIdCard(false);
+      setExistingMembership(null);
+      setCheckingMembership(false);
       return;
     }
 
     // 簡單判斷長度，避免每輸入一個字就打 DB
     if (value.length < 10) {
-      setIdCardExistingName(null);
-      setCheckingIdCard(false);
+      setExistingMembership(null);
+      setCheckingMembership(false);
       return;
     }
 
     let cancelled = false;
-    setCheckingIdCard(true);
+    setCheckingMembership(true);
 
     const timer = setTimeout(() => {
       void (async () => {
         try {
           const { data, error } = await supabase
-            .from("participants")
-            .select("name")
+            .from("memberships")
+            .select("status, expires_on")
             .eq("id_card", value)
             .maybeSingle();
 
           if (cancelled) return;
           if (error) {
-            setIdCardExistingName(null);
+            setExistingMembership(null);
             return;
           }
 
-          setIdCardExistingName((data as { name?: string } | null)?.name ?? "");
+          if (!data) {
+            setExistingMembership(null);
+            return;
+          }
+
+          const row = data as {
+            status?: string | null;
+            expires_on?: string | null;
+          };
+          setExistingMembership({
+            status: row.status ?? "unknown",
+            expires_on: row.expires_on ?? null,
+          });
         } finally {
-          if (!cancelled) setCheckingIdCard(false);
+          if (!cancelled) setCheckingMembership(false);
         }
       })();
     }, 450);
@@ -216,14 +234,15 @@ export default function MembershipJoinPage() {
                 className="input input-bordered w-full"
               />
 
-              {checkingIdCard ? (
-                <p className="text-xs mt-2 text-gray-500">正在檢查是否已填過資料...</p>
-              ) : idCardExistingName !== null ? (
+              {checkingMembership ? (
+                <p className="text-xs mt-2 text-gray-500">正在檢查是否已有會籍...</p>
+              ) : existingMembership ? (
                 <div className="mt-3 rounded-lg bg-warning/10 px-3 py-2 text-sm text-gray-800 leading-6">
                   <p className="font-bold">提醒</p>
                   <p>
-                    此身分證已存在資料{idCardExistingName ? `（姓名：${idCardExistingName}）` : ""}。
-                    本頁送出會更新既有資料；若您要辦理會員續費，請改用「會員續費」頁面。
+                    此身分證已建立會員會籍（狀態：{existingMembership.status}
+                    {existingMembership.expires_on ? `，到期日：${existingMembership.expires_on}` : ""}）。
+                    若您要辦理會員續費，請改用「會員續費」頁面。
                   </p>
                 </div>
               ) : null}
