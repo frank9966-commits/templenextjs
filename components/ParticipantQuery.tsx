@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 interface ParticipantQueryProps {
@@ -22,6 +23,8 @@ export interface Participant {
 
 const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _currentEvent }) => {
   void _currentEvent;
+
+  const router = useRouter();
 
   const [idCard, setIdCard] = useState("");
   const [basicInfo, setBasicInfo] = useState<{
@@ -131,9 +134,11 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       zodiac_sign: member.zodiac_sign || "未填寫",
       memo: member.memo || "未填寫",
       event_id: latestEvent.id,
+      pay_status: "未繳交",
       admin_viewed: false,
       agency_name: member.agency_name || "",
       sex: member.sex || "",
+      updated_at: new Date().toISOString(),
     };
 
 
@@ -148,6 +153,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       alert(
         `報名成功！\n\n基本資料更新成功！\n一、帳號：中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
       );
+      router.push("/");
     }
   };
 
@@ -176,9 +182,11 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       zodiac_sign: basicInfo.zodiac_sign || "未填寫",
       memo: basicInfo.memo || "未填寫",
       event_id: latestEvent.id,
+      pay_status: "未繳交",
       admin_viewed: false,
       agency_name: basicInfo.agency_name || "",
       sex: basicInfo.sex || "",
+      updated_at: new Date().toISOString(),
     };
 
 
@@ -193,6 +201,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       alert(
         `報名成功！\n\n基本資料更新成功！\n一、帳號：中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
       );
+      router.push("/");
     }
   };
 

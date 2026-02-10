@@ -205,7 +205,7 @@ export default function AdminDashboard() {
 
           <div className="overflow-x-auto max-h-[700px]">
             <table className="min-w-[150vw] table-auto border-collapse border border-gray-300">
-              <thead className="bg-gray-200 sticky top-0 z-20">
+              <thead className="bg-gray-100 text-slate-700 sticky top-0 z-20">
                 <tr className="text-left">
                   <th className="border border-gray-300 p-2">刪除</th>
                   {headers.map((header) => (
@@ -219,7 +219,7 @@ export default function AdminDashboard() {
                 {group.map((p) => {
                   const isEdited = new Date(p.created_at).getTime() !== new Date(p.updated_at).getTime();
                   const hasChanges = isEdited || (p.participation_status && p.participation_status !== "none");
-                  const highlight = !p.admin_viewed && hasChanges ? "bg-yellow-100" : "";
+                  const highlight = !p.admin_viewed && hasChanges ? "bg-slate-100 border-l-4 border-amber-400 text-slate-900" : "";
 
                   return (
                     <tr key={p.id} className={`${highlight} border border-gray-300`}>
@@ -255,7 +255,7 @@ export default function AdminDashboard() {
                       <td className="border border-gray-300 p-2">{new Date(p.updated_at).toLocaleString()}</td>
                       <td className="border border-gray-300 p-2">
                         <select
-                          className="border p-1 rounded"
+                          className="border border-slate-300 bg-white text-slate-900 p-1 rounded"
                           value={p.pay_status || "未繳交"}
                           onChange={(e) => updatePayStatus(p.id, e.target.value)}
                         >

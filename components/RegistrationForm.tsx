@@ -72,6 +72,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
       event_date: trimmedEventDate,
       sex: trimmedSex,
       agency_name: participationStatus === "agent" ? trimmedAgencyName : null,
+      updated_at: new Date().toISOString(),
     };
 
     const { data: existed, error: fetchError } = await supabase
