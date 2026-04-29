@@ -1,7 +1,6 @@
 // RegistrationForm.tsx
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { useRouter } from "next/navigation";
 
 interface RegistrationFormProps {
   currentEvent: { id: number; title: string };
@@ -10,7 +9,6 @@ interface RegistrationFormProps {
 type ParticipationStatus = "join" | "none" | "agent";
 
 const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => {
-  const router = useRouter();
   const [idCard, setIdCard] = useState("");
   const [basicInfo, setBasicInfo] = useState<{ name: string } | null>({ name: "" });
   const [address, setAddress] = useState("");
@@ -24,6 +22,20 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
 
   const [participationStatus, setParticipationStatus] = useState<ParticipationStatus | null>(null);
   const [error, setError] = useState("");
+
+  const resetForm = () => {
+    setIdCard("");
+    setBasicInfo({ name: "" });
+    setAddress("");
+    setBirthday("");
+    setFamilyId("");
+    setMemo("");
+    setZodiacSign("");
+    setEventDate("");
+    setSex("");
+    setAgencyName("");
+    setParticipationStatus(null);
+  };
 
   useEffect(() => {
     if (error) {
@@ -98,11 +110,11 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
         } else {
           alert(`名字: ${trimmedName} 註冊成功但選擇不參加。`);
         }
-        window.location.reload();
+        resetForm();
       }
     } else {
-      alert("此身分證已註冊過");
-      router.push("/");
+      alert("此身分證已完成報名，如需修改請回首頁重新進入。");
+      resetForm();
     }
   };
 

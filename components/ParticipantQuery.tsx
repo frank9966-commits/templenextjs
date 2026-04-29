@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 interface ParticipantQueryProps {
@@ -21,12 +20,9 @@ export interface Participant {
   sex?: string;
 }
 
-const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _currentEvent }) => {
-  void _currentEvent;
-
-  const router = useRouter();
-
+const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent }) => {
   const [idCard, setIdCard] = useState("");
+  const [submittedIds, setSubmittedIds] = useState<string[]>([]);
   const [basicInfo, setBasicInfo] = useState<{
     name: string;
     address?: string;
@@ -57,6 +53,11 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
     setError("");
     const normalizedId = idCard.toUpperCase();
 
+    if (submittedIds.includes(normalizedId)) {
+      setError("此身分證本次已完成報名，如需修改請回首頁重新進入。");
+      return;
+    }
+
     const { data, error } = await supabase
       .from("participants")
       .select("*")
@@ -68,16 +69,17 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       setBasicInfo(null);
       setFamilyMembers([]);
     } else {
+      const isNewEvent = data.event_id !== currentEvent.id;
       setBasicInfo({
         name: data.name,
         address: data.address,
         birthday: data.birthday,
         family_id: data.family_id || normalizedId,
-        event_date: data.event_date,
-        participation_status: data.participation_status,
+        event_date: isNewEvent ? "" : data.event_date,
+        participation_status: isNewEvent ? null : data.participation_status,
         zodiac_sign: data.zodiac_sign,
         memo: data.memo,
-        agency_name: data.agency_name || "",
+        agency_name: isNewEvent ? "" : (data.agency_name || ""),
         sex: data.sex || "",
       });
 
@@ -136,7 +138,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       event_id: latestEvent.id,
       pay_status: "未繳交",
       admin_viewed: false,
-      agency_name: member.agency_name || "",
+      agency_name: member.participation_status === "agent" ? (member.agency_name || "") : null,
       sex: member.sex || "",
       updated_at: new Date().toISOString(),
     };
@@ -153,7 +155,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       alert(
         `報名成功！\n\n基本資料更新成功！\n一、帳號：中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
       );
-      router.push("/");
+      setSubmittedIds((prev) => [...prev, member.id_card]);
     }
   };
 
@@ -184,7 +186,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       event_id: latestEvent.id,
       pay_status: "未繳交",
       admin_viewed: false,
-      agency_name: basicInfo.agency_name || "",
+      agency_name: basicInfo.participation_status === "agent" ? (basicInfo.agency_name || "") : null,
       sex: basicInfo.sex || "",
       updated_at: new Date().toISOString(),
     };
@@ -201,7 +203,10 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent: _curr
       alert(
         `報名成功！\n\n基本資料更新成功！\n一、帳號：中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
       );
-      router.push("/");
+      setSubmittedIds((prev) => [...prev, idCard.toUpperCase()]);
+      setIdCard("");
+      setBasicInfo(null);
+      setFamilyMembers([]);
     }
   };
 
