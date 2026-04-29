@@ -21,21 +21,8 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
   const [agencyName, setAgencyName] = useState("");
 
   const [participationStatus, setParticipationStatus] = useState<ParticipationStatus | null>(null);
+  const [isLocked, setIsLocked] = useState(false);
   const [error, setError] = useState("");
-
-  const resetForm = () => {
-    setIdCard("");
-    setBasicInfo({ name: "" });
-    setAddress("");
-    setBirthday("");
-    setFamilyId("");
-    setMemo("");
-    setZodiacSign("");
-    setEventDate("");
-    setSex("");
-    setAgencyName("");
-    setParticipationStatus(null);
-  };
 
   useEffect(() => {
     if (error) {
@@ -49,6 +36,11 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (isLocked) {
+      setError("此筆報名已鎖定，請回首頁重新進入後再調整。");
+      return;
+    }
 
     const trimmedIdCard = idCard.trim();
     const trimmedName = basicInfo?.name.trim() || "";
@@ -110,17 +102,17 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
         } else {
           alert(`名字: ${trimmedName} 註冊成功但選擇不參加。`);
         }
-        resetForm();
+        setIsLocked(true);
       }
     } else {
       alert("此身分證已完成報名，如需修改請回首頁重新進入。");
-      resetForm();
+      setIsLocked(true);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="card w-full shadow-xl bg-base-100">
-      <div className="card-body space-y-4">
+      <fieldset disabled={isLocked} className="card-body space-y-4">
         <div className="form-control">
           <label className="label">
             <span className="label-text">身分證</span>
@@ -339,7 +331,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ currentEvent }) => 
           送出報名
         </button>
         {error && <p className="text-red-500 text-center">{error}</p>}
-      </div>
+      </fieldset>
+      {isLocked && (
+        <p className="px-6 pb-6 text-center text-sm text-gray-600">
+          已送出並鎖定本畫面。如需修改，請先回首頁再重新進入。
+        </p>
+      )}
     </form>
   );
 };
