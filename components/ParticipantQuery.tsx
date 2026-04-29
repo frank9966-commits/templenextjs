@@ -240,12 +240,11 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent }) => 
         >
           查詢資料
         </button>
+        {error && <p className="text-red-500 text-center">{error}</p>}
 
 
         {basicInfo && (
           <div className="card shadow-lg bg-base-50 mt-4">
-            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-
             <div className="mb-4">
               <h2 className="text-lg font-bold">我的基本資料</h2>
               <div className="form-control">
