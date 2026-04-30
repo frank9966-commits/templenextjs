@@ -23,7 +23,7 @@ export interface Participant {
 const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent }) => {
   const [idCard, setIdCard] = useState("");
   const [submittedIds, setSubmittedIds] = useState<string[]>([]);
-  const [isLocked, setIsLocked] = useState(false);
+  const [isBasicInfoLocked, setIsBasicInfoLocked] = useState(false);
   const [basicInfo, setBasicInfo] = useState<{
     name: string;
     address?: string;
@@ -52,12 +52,6 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent }) => 
   const handleCheckId = async () => {
     if (!idCard) return;
     setError("");
-
-    if (isLocked) {
-      setError("此頁面已鎖定，請回首頁重新進入後再調整。");
-      return;
-    }
-
     const normalizedId = idCard.toUpperCase();
 
     if (submittedIds.includes(normalizedId)) {
@@ -100,7 +94,16 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent }) => 
           setError("無法取得家族成員資料：" + familyError.message);
           setFamilyMembers([]);
         } else {
-          setFamilyMembers(familyData.filter((m) => m.id_card !== normalizedId));
+          setFamilyMembers(
+            familyData
+              .filter((m) => m.id_card !== normalizedId)
+              .map((m) => {
+                const memberIsNewEvent = m.event_id !== currentEvent.id;
+                return memberIsNewEvent
+                  ? { ...m, participation_status: undefined, agency_name: "" }
+                  : m;
+              })
+          );
         }
       } else {
         setFamilyMembers([]);
@@ -163,7 +166,6 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent }) => 
         `報名成功！\n\n基本資料更新成功！\n一、帳號：中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
       );
       setSubmittedIds((prev) => [...prev, member.id_card]);
-      setIsLocked(true);
     }
   };
 
@@ -212,13 +214,13 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent }) => 
         `報名成功！\n\n基本資料更新成功！\n一、帳號：中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊`
       );
       setSubmittedIds((prev) => [...prev, idCard.toUpperCase()]);
-      setIsLocked(true);
+      setIsBasicInfoLocked(true);
     }
   };
 
   return (
     <div className="card w-full shadow-xl bg-base-100">
-      <fieldset disabled={isLocked} className="card-body space-y-4">
+      <div className="card-body space-y-4">
         <p className="text-center text-lg">請輸入您的身分證以查詢基本資料：</p>
 
         <div className="form-control">
@@ -245,7 +247,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent }) => 
 
         {basicInfo && (
           <div className="card shadow-lg bg-base-50 mt-4">
-            <div className="mb-4">
+            <fieldset disabled={isBasicInfoLocked} className="mb-4">
               <h2 className="text-lg font-bold">我的基本資料</h2>
               <div className="form-control">
                 <label className="label">
@@ -449,7 +451,12 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent }) => 
               >
                 更新基本資料
               </button>
-            </div>
+              {isBasicInfoLocked && (
+                <p className="mt-2 text-center text-sm text-gray-500">
+                  已送出並鎖定。如需修改，請先回首頁再重新進入。
+                </p>
+              )}
+            </fieldset>
 
             <div className="space-y-4">
               <h2 className="text-lg font-bold">家族成員</h2>
@@ -457,7 +464,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent }) => 
                 <ul className="space-y-4">
                   {familyMembers.map((member, index) => (
                     <li key={member.id_card} className="p-2 rounded shadow">
-                      <div className="flex flex-col space-y-2">
+                      <fieldset disabled={submittedIds.includes(member.id_card)} className="flex flex-col space-y-2">
                         <div className="form-control">
                           <label className="label">
                             <span className="label-text">姓名</span>
@@ -661,7 +668,12 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent }) => 
                         >
                           提交
                         </button>
-                      </div>
+                        {submittedIds.includes(member.id_card) && (
+                          <p className="mt-2 text-center text-sm text-gray-500">
+                            已送出並鎖定。如需修改，請先回首頁再重新進入。
+                          </p>
+                        )}
+                      </fieldset>
                     </li>
                   ))}
                 </ul>
@@ -671,12 +683,7 @@ const ParticipantQuery: React.FC<ParticipantQueryProps> = ({ currentEvent }) => 
             </div>
           </div>
         )}
-      </fieldset>
-      {isLocked && (
-        <p className="px-6 pb-6 text-center text-sm text-gray-600">
-          已送出並鎖定本畫面。如需修改，請先回首頁再重新進入。
-        </p>
-      )}
+      </div>
     </div>
   );
 };
