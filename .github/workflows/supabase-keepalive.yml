@@ -3,6 +3,9 @@ name: Supabase Keep Alive
 # 目的：免費版 Supabase 專案若一週內沒有任何資料庫活動就會被自動暫停（paused）。
 # 這個 workflow 會每天自動打一次資料庫，讓專案保持活躍、不會被關掉。
 #
+# 注意：GitHub 會在 repo「60 天完全沒有 commit」後自動停用 schedule。
+# 所以這份只當備援；正式以 Vercel Cron (/api/keepalive) 為主。
+#
 # 這裡用的是 anon key（公開金鑰），本來就會被打包進前端網站、任何人都看得到，
 # 所以直接寫在這裡是安全的，不需要另外設定 Secrets。
 # 若之後換專案，也可以在 repo Settings > Secrets 建立 SUPABASE_URL / SUPABASE_ANON_KEY 來覆寫。

@@ -3,5 +3,11 @@
   "routes": [
     { "src": "/api/auth/.*", "dest": "/api/auth/[...nextauth]" },
     { "handle": "filesystem" }
+  ],
+  "crons": [
+    {
+      "path": "/api/keepalive",
+      "schedule": "0 0 * * *"
+    }
   ]
 }
