@@ -127,48 +127,39 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
       return;
     }
 
-    // 新增該家族成員的捐款紀錄
+    // 先扣餘額，成功後再寫入捐款紀錄，避免只寫入沒扣款造成餘額不符
+    const { data: rpcData, error: rpcError } = await supabase.rpc("deduct_amount", {
+      event_id: _currentEvent.id,
+      amount: donationValue,
+    });
+    if (rpcError) {
+      alert("捐款失敗：" + rpcError.message);
+      return;
+    }
+
     const { error: insertError } = await supabase
       .from("donations")
       .insert([
         {
           event_id: _currentEvent.id,
-          participant_id: member.id,  // 注意：請確保 member 資料中有 id 欄位
+          participant_id: member.id,
           donation_amount: donationValue,
+          donations_memo: member.donations_memo || "",
         },
-      ])
-      .single();
+      ]);
     if (insertError) {
+      await supabase.rpc("add_amount", {
+        event_id_input: _currentEvent.id,
+        amount_input: donationValue,
+      });
       alert("新增家族捐款紀錄失敗：" + insertError.message);
       return;
-    } else {
-      alert("家族捐款紀錄新增成功！\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊");
     }
 
-    // 扣除活動金額（與主捐款邏輯相同）
-    const { data: eventData, error: eventFetchError } = await supabase
-      .from("donations_events")
-      .select("*")
-      .eq("id", _currentEvent.id)
-      .single();
-    if (eventFetchError || !eventData) {
-      alert("無法取得活動資料");
-      return;
-    }
-    if (eventData.id !== _currentEvent.id) {
-      alert("活動 ID 不匹配，無法扣款");
-      return;
-    }
-    const newTotalAmount = eventData.total_amount - donationValue;
-    const { error: updateEventError } = await supabase
-      .from("donations_events")
-      .update({ total_amount: newTotalAmount })
-      .eq("id", _currentEvent.id);
-    if (updateEventError) {
-      alert("捐款失敗");
-    } else {
-      alert("活動金額扣除成功，剩餘：" + newTotalAmount);
-    }
+    alert(
+      "家族捐款紀錄新增成功！\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊\n剩餘：" +
+        Number(rpcData).toLocaleString()
+    );
   };
 
   const handleFamilyMemberChange = (
@@ -202,7 +193,17 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
       return;
     }
 
-    // 新增捐款紀錄（與原邏輯類似）
+    // 先扣餘額，再寫入捐款；避免「有捐款紀錄但餘額沒扣」造成前後台金額不符
+    const { data: rpcData, error: rpcError } = await supabase.rpc("deduct_amount", {
+      event_id: _currentEvent.id,
+      amount: donationAmountNum,
+    });
+    if (rpcError) {
+      alert("捐款失敗：" + rpcError.message);
+      return;
+    }
+
+    // 正確欄位是 donations_memo（後台讀這個）；donation_note 是舊錯誤寫入欄位
     const { error: insertError } = await supabase
       .from("donations")
       .insert([
@@ -210,30 +211,23 @@ const DonationsQuery: React.FC<DonationsQueryProps> = ({ currentEvent: _currentE
           event_id: _currentEvent.id,
           participant_id: participantId,
           donation_amount: donationAmountNum,
-          donation_note: basicInfo?.donations_memo || ""
+          donations_memo: basicInfo?.donations_memo || "",
         },
-      ])
-      .single();
+      ]);
 
     if (insertError) {
+      await supabase.rpc("add_amount", {
+        event_id_input: _currentEvent.id,
+        amount_input: donationAmountNum,
+      });
       alert("新增捐款紀錄失敗：" + insertError.message);
       return;
-    } else {
-      alert("捐款紀錄新增成功！\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊");
     }
 
-    // 呼叫 RPC 函數，讓資料庫原子性地扣除活動金額
-    const { data: rpcData, error: rpcError } = await supabase
-      .rpc("deduct_amount", {
-        event_id: _currentEvent.id,   // 必須跟函數參數 event_id 對應
-        amount: donationAmountNum     // 必須跟函數參數 amount 對應
-      });
-
-    if (rpcError) {
-      alert("捐款失敗");
-    } else {
-      alert("活動金額扣除成功，剩餘：" + rpcData.toLocaleString());
-    }
+    alert(
+      "捐款紀錄新增成功！\n一、帳號: 中國信託822-10454-029-5035\n（請註明帳號末四碼或截圖給蓉蓉師姊）\n二、LINE Pay轉給蓉蓉師姊\n剩餘：" +
+        Number(rpcData).toLocaleString()
+    );
   };
 
 

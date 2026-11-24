@@ -9,6 +9,7 @@ export interface Donation {
   donation_status?: string;
   created_at: string;
   donations_memo?: string;
+  donation_note?: string;
   participants: {
     name: string;
     id_card: string;
@@ -43,7 +44,7 @@ export default function ExportExcel({ data, filename }: ExportExcelProps) {
           : item.donation_status === "已捐款"
             ? "已匯款"
             : item.donation_status) || "未匯款",
-      備註: item.donations_memo || "-",
+      備註: (item.donations_memo || item.donation_note || "").trim() || "-",
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);

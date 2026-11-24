@@ -88,43 +88,13 @@ const DonationsForm: React.FC<DonationsFormProps> = ({ currentEvent }) => {
       participantId = existed.id;
     }
 
-    // 6. 先更新活動總金額（使用樂觀鎖 Optimistic Locking 防止超賣）
-    // 取得當前活動資料
-    const { data: eventData, error: eventFetchError } = await supabase
-      .from("donations_events")
-      .select("id, total_amount")
-      .eq("id", currentEvent.id)
-      .single();
-
-    if (eventFetchError || !eventData) {
-      setError("無法取得活動資料：" + (eventFetchError?.message || "未知錯誤"));
-      return;
-    }
-
-    // 檢查餘額是否足夠
-    if (eventData.total_amount < donationAmountNum) {
-      setError("捐款金額不能超過活動總金額。");
-      return;
-    }
-
-    const newTotal = eventData.total_amount - donationAmountNum;
-
-    // 嘗試更新金額，並檢查 total_amount 是否仍為我們剛讀取的值 (樂觀鎖)
-    const { data: updatedEvent, error: updateEventError } = await supabase
-      .from("donations_events")
-      .update({ total_amount: newTotal })
-      .eq("id", currentEvent.id)
-      .eq("total_amount", eventData.total_amount) // 關鍵：確保更新時金額未被其他人修改
-      .select();
-
-    if (updateEventError) {
-      setError("更新活動總金額失敗：" + updateEventError.message);
-      return;
-    }
-
-    // 如果沒有更新任何資料，表示 total_amount 已經被其他人改過了
-    if (!updatedEvent || updatedEvent.length === 0) {
-      setError("很抱歉，就在剛才額度已被搶光或變動，請重新嘗試。");
+    // 6. 先以 RPC 扣除餘額，再寫入捐款紀錄（失敗則加回）
+    const { error: rpcError } = await supabase.rpc("deduct_amount", {
+      event_id: currentEvent.id,
+      amount: donationAmountNum,
+    });
+    if (rpcError) {
+      setError("捐款失敗：" + rpcError.message);
       return;
     }
 
@@ -141,10 +111,12 @@ const DonationsForm: React.FC<DonationsFormProps> = ({ currentEvent }) => {
       ]);
 
     if (donationError) {
-      // 如果捐款紀錄插入失敗，理論上應該要補償(rollback)活動金額，但前端做 rollback 有風險。
-      // 這裡先提示錯誤，請管理員處理。
+      await supabase.rpc("add_amount", {
+        event_id_input: currentEvent.id,
+        amount_input: donationAmountNum,
+      });
       console.error("Critical Error: Quota deducted but donation record failed.", donationError);
-      setError("捐款紀錄建立失敗，但額度已扣除。請聯繫管理員處理。" + donationError.message);
+      setError("捐款紀錄建立失敗：" + donationError.message);
       return;
     }
 

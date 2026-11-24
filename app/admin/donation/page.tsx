@@ -11,6 +11,7 @@ interface Donation {
   donation_status?: string;
   created_at: string;
   donations_memo?: string;
+  donation_note?: string;
   participants: {
     name: string;
     id_card: string;
@@ -22,7 +23,12 @@ interface Donation {
     title: string;
     id: number;
     total_amount: number;
+    allamount?: number;
   } | null;
+}
+
+function getDonationMemo(d: Donation) {
+  return (d.donations_memo || d.donation_note || "").trim();
 }
 
 export default function DonationDashboard() {
@@ -52,7 +58,7 @@ export default function DonationDashboard() {
         .select(`
           *,
           participants(name, id_card, birthday, address, sex),
-          donations_events(id, title, total_amount)
+          donations_events(id, title, total_amount, allamount)
         `)
         .order("created_at", { ascending: false }); // ⬅️ 這行就是關鍵;
 
@@ -165,11 +171,33 @@ export default function DonationDashboard() {
       </div>
       {error && <p className="text-red-500 text-center">{error}</p>}
       {selectedEventId && (
-        <h2 className="text-xl font-bold mb-2">
-          當前活動：{
-            eventOptions.find((e) => e?.id === selectedEventId)?.title || "未知活動"
-          }
-        </h2>
+        <div className="mb-2 space-y-1">
+          <h2 className="text-xl font-bold">
+            當前活動：
+            {eventOptions.find((e) => e?.id === selectedEventId)?.title || "未知活動"}
+          </h2>
+          <p className="text-sm">
+            已募款合計：
+            {filteredDonations
+              .reduce((sum, d) => sum + (Number(d.donation_amount) || 0), 0)
+              .toLocaleString()}
+            ／目標：
+            {(
+              eventOptions.find((e) => e?.id === selectedEventId)?.allamount || 0
+            ).toLocaleString()}
+            ／剩餘：
+            {Math.max(
+              0,
+              Number(
+                eventOptions.find((e) => e?.id === selectedEventId)?.allamount || 0
+              ) -
+                filteredDonations.reduce(
+                  (sum, d) => sum + (Number(d.donation_amount) || 0),
+                  0
+                )
+            ).toLocaleString()}
+          </p>
+        </div>
       )}
       <div className="overflow-x-auto max-h-[700px]">
         <table className="min-w-[1200px] table-auto border-collapse border border-gray-300">
@@ -216,7 +244,7 @@ export default function DonationDashboard() {
                     <option value="已匯款">已匯款</option>
                   </select>
                 </td>
-                <td className="border border-gray-300 p-2">{d.donations_memo || "-"}</td>
+                <td className="border border-gray-300 p-2">{getDonationMemo(d) || "-"}</td>
               </tr>
             ))}
           </tbody>
